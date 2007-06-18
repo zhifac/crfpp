@@ -5,57 +5,63 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef MECAB_LBFGS_H
-#define MECAB_LBFGS_H
+#ifndef CRFPP_LBFGS_H_
+#define CRFPP_LBFGS_H_
 
 #include <vector>
-#include "common.h"
-
-extern "C" {
-  extern void lbfgs(int* n, int* m, double* x, double* f, double* g,
-                    int* diagco, double* diag, int* iprint, double* eps,
-                    double* xtol, double* w, int* iflag);
-}
+#include <iostream>
 
 namespace CRFPP {
 
   class LBFGS {
   private:
-    int n_;
-    int m_;
-    int iflag_;
-    whatlog what_;
+    class Mcsrch;
+    int iflag_, iscn, nfev, iycn, point, npt, iter, info, ispt, isyt, iypt, maxfev;
+    double stp, stp1;
     std::vector <double> diag_;
     std::vector <double> w_;
+    Mcsrch *mcsrch_;
+
+    void lbfgs_optimize(int size,
+                        int msize,
+                        double *x,
+                        double f,
+                        const double *g,
+                        double *diag,
+                        double *w, int *iflag);
 
   public:
-    explicit LBFGS(): n_(0), m_(5), iflag_(0) {}
-    virtual ~LBFGS() {}
+    explicit LBFGS(): iflag_(0), iscn(0), nfev(0), iycn(0),
+                      point(0), npt(0), iter(0), info(0),
+                      ispt(0), isyt(0), iypt(0), maxfev(0),
+                      stp(0.0), stp1(0.0), mcsrch_(0) {}
+    virtual ~LBFGS() { clear(); }
 
-    const char *what() { return what_.str(); }
+    void clear();
 
-    int init(int _n, int _m) {
-      n_ = _n;
-      m_ = _m;
-      w_.resize(n_ *(2 * m_ + 1) + 2 * m_);
-      diag_.resize(n_);
-      return 0;
-    }
-
-    int optimize(double *x, double *f, double *g) {
-      int iprint[] = {-1, 0};
-      double eta  = 1e-7;
-      double xtol = 1e-7;
-      int diagco = 0;
-      lbfgs(&n_, &m_, x, f, g, &diagco, &diag_[0],
-            iprint, &eta, &xtol, &w_[0], &iflag_);
-
-      if (iflag_ < 0) {
-        CHECK_FALSE(false) << "routine stops with unexpected error";
+    int optimize(size_t size, double *x, double f, double *g) {
+      static const int msize = 5;
+      if (w_.empty()) {
+        iflag_ = 0;
+        w_.resize(size * (2 * msize + 1) + 2 * msize);
+        diag_.resize(size);
+      } else if (diag_.size() != size) {
+        std::cerr << "size of array is different" << std::endl;
         return -1;
       }
 
-      if (iflag_ == 0) return 0;   // terminate
+      lbfgs_optimize(static_cast<int>(size),
+                      msize, x, f, g, &diag_[0], &w_[0], &iflag_);
+
+      if (iflag_ < 0) {
+        std::cerr << "routine stops with unexpected error" << std::endl;
+        return -1;
+      }
+
+      if (iflag_ == 0) {
+        clear();
+        return 0;   // terminate
+      }
 
       return 1;   // evaluate next f and g
     }

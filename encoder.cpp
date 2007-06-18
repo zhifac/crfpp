@@ -156,7 +156,6 @@ namespace CRFPP {
     double old_obj = 1e+37;
     int    converge = 0;
     LBFGS lbfgs;
-    lbfgs.init(feature_index->size(), 5);
     std::vector<CRFEncoderThread> thread(thread_num);
 
     for (size_t i = 0; i < thread_num; i++) {
@@ -208,8 +207,9 @@ namespace CRFPP {
 
       if (itr > maxitr || converge == 3)  break;  // 3 is ad-hoc
 
-      if (lbfgs.optimize(&alpha[0],
-                         &thread[0].obj,
+      if (lbfgs.optimize(feature_index->size(),
+			 &alpha[0],
+                         thread[0].obj,
                          &thread[0].expected[0]) <= 0)
         return false;
     }

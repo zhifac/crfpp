@@ -135,9 +135,9 @@ namespace CRFPP {
   }
 
   bool TaggerImpl::add(const char* line) {
-    const char* column[1024];
+    const char* column[8192];
     char *p = feature_index_->strdup(line);
-    size_t size = tokenize2(p, "\t ", column, 1024);
+    size_t size = tokenize2(p, "\t ", column, sizeof(column));
     if (!add2(size, column, false)) return false;
     return true;
   }

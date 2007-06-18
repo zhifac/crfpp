@@ -4,7 +4,7 @@ bin_PROGRAMS = crf_learn crf_test
 
 AUTOMAKE_OPTIONS = no-dependencies
 lib_LTLIBRARIES = libcrfpp.la
-libcrfpp_la_SOURCES = crfpp.h thread.h libcrfpp.cpp lbfgs.c scoped_ptr.h param.cpp param.h encoder.cpp feature.cpp stream_wrapper.h \
+libcrfpp_la_SOURCES = crfpp.h thread.h libcrfpp.cpp lbfgspp.cpp scoped_ptr.h param.cpp param.h encoder.cpp feature.cpp stream_wrapper.h \
                       feature_cache.cpp feature_index.cpp node.cpp path.cpp tagger.cpp \
 		      common.h darts.h encoder.h feature_cache.h feature_index.h \
                       freelist.h lbfgs.h mmap.h node.h path.h tagger.h timer.h
