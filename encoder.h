@@ -15,7 +15,7 @@ namespace CRFPP {
   private:
     whatlog what_;
   public:
-    enum { CRF, MIRA };
+    enum { CRF_L2, CRF_L1, MIRA };
     bool learn(const char *, const char *, const char *, bool, size_t, size_t,
                double, double, unsigned short, unsigned short, int);
     bool convert(const char *, const char*);

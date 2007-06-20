@@ -38,6 +38,13 @@ namespace CRFPP {
   template <class T> inline T _min(T x, T y) { return(x < y) ? x : y; }
   template <class T> inline T _max(T x, T y) { return(x > y) ? x : y; }
 
+  // helper functions defined in the paper
+  inline double sigma(double x) {
+    if (x > 0) return 1.0;
+    else if (x < 0) return -1.0;
+    return 0.0;
+  }
+
   template <class Iterator>
   inline size_t tokenizeCSV(char *str,
                             Iterator out, size_t max) {
@@ -273,4 +280,3 @@ if (!(condition)) \
 (condition) ? 0 : warn() & std::cerr << __FILE__ << \
 "(" << __LINE__ << ") [" << #condition << "] "
 #endif
-

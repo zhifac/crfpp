@@ -25,6 +25,7 @@
 */
 
 #include "lbfgs.h"
+#include "common.h"
 #include <cmath>
 #include <iostream>
 #include <numeric>
@@ -41,6 +42,10 @@ namespace {
   static const double lb3_1_stpmax = 1e20;
   static const int lb3_1_mp = 6;
   static const int lb3_1_lp = 6;
+
+  inline double pi(double x, double y) {
+     return CRFPP::sigma(x) == CRFPP::sigma(y) ?x : 0.0;
+  }
 
   inline void daxpy_(int n, double da, const double *dx, double *dy) {
     for (int i = 0; i < n; ++i)
@@ -241,7 +246,7 @@ namespace CRFPP {
                 double *x,
                 double f, const double *g, double *s,
                 double *stp,
-                int *info, int *nfev, double *wa) {
+                int *info, int *nfev, double *wa, bool orthant) {
       static const double p5 = 0.5;
       static const double p66 = 0.66;
       static const double xtrapf = 4.0;
@@ -297,8 +302,16 @@ namespace CRFPP {
           *stp = stx;
         }
 
-        for (int j = 1; j <= size; ++j) {
-          x[j] = wa[j] + *stp * s[j];
+        if (orthant) {
+          for (int j = 1; j <= size; ++j) {
+            double p = pi(s[j], -g[j]);
+            double eta = wa[j] == 0 ? sigma(-g[j]) : sigma(wa[j]);
+            x[j] = pi(wa[j] + *stp * p, eta);
+          }
+        } else {
+          for (int j = 1; j <= size; ++j) {
+            x[j] = wa[j] + *stp * s[j];
+          }
         }
         *info = -1;
         return;
@@ -385,6 +398,7 @@ namespace CRFPP {
                              const double *g,
                              double *diag,
                              double *w,
+                             bool orthant,
                              int *iflag) {
     double yy = 0.0;
     double ys = 0.0;
@@ -488,7 +502,7 @@ namespace CRFPP {
 
     L172:
       mcsrch_->mcsrch(size, &x[1], f, &g[1], &w[ispt + point * size + 1],
-                      &stp, &info, &nfev, &diag[1]);
+                      &stp, &info, &nfev, &diag[1], orthant);
       if (info == -1) {
         *iflag = 1;  // next value
         return;

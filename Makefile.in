@@ -92,7 +92,7 @@ bin_PROGRAMS = crf_learn crf_test
 
 AUTOMAKE_OPTIONS = no-dependencies
 lib_LTLIBRARIES = libcrfpp.la
-libcrfpp_la_SOURCES = crfpp.h thread.h libcrfpp.cpp lbfgspp.cpp scoped_ptr.h param.cpp param.h encoder.cpp feature.cpp stream_wrapper.h                       feature_cache.cpp feature_index.cpp node.cpp path.cpp tagger.cpp 		      common.h darts.h encoder.h feature_cache.h feature_index.h                       freelist.h lbfgs.h mmap.h node.h path.h tagger.h timer.h
+libcrfpp_la_SOURCES = crfpp.h thread.h libcrfpp.cpp lbfgs.cpp scoped_ptr.h param.cpp param.h encoder.cpp feature.cpp stream_wrapper.h                       feature_cache.cpp feature_index.cpp node.cpp path.cpp tagger.cpp 		      common.h darts.h encoder.h feature_cache.h feature_index.h                       freelist.h lbfgs.h mmap.h node.h path.h tagger.h timer.h
 
 include_HEADERS = crfpp.h
 
@@ -114,7 +114,7 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libcrfpp_la_LDFLAGS = 
 libcrfpp_la_LIBADD = 
-libcrfpp_la_OBJECTS =  libcrfpp.lo lbfgspp.lo param.lo encoder.lo \
+libcrfpp_la_OBJECTS =  libcrfpp.lo lbfgs.lo param.lo encoder.lo \
 feature.lo feature_cache.lo feature_index.lo node.lo path.lo tagger.lo
 bin_PROGRAMS =  crf_learn$(EXEEXT) crf_test$(EXEEXT)
 PROGRAMS =  $(bin_PROGRAMS)

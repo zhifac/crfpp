@@ -28,7 +28,7 @@ namespace CRFPP {
                         double f,
                         const double *g,
                         double *diag,
-                        double *w, int *iflag);
+                        double *w, bool orthant, int *iflag);
 
   public:
     explicit LBFGS(): iflag_(0), iscn(0), nfev(0), iycn(0),
@@ -39,7 +39,7 @@ namespace CRFPP {
 
     void clear();
 
-    int optimize(size_t size, double *x, double f, double *g) {
+    int optimize(size_t size, double *x, double f, double *g, bool orthant) {
       static const int msize = 5;
       if (w_.empty()) {
         iflag_ = 0;
@@ -51,7 +51,7 @@ namespace CRFPP {
       }
 
       lbfgs_optimize(static_cast<int>(size),
-                      msize, x, f, g, &diag_[0], &w_[0], &iflag_);
+                      msize, x, f, g, &diag_[0], &w_[0], orthant, &iflag_);
 
       if (iflag_ < 0) {
         std::cerr << "routine stops with unexpected error" << std::endl;

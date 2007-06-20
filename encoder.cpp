@@ -152,7 +152,8 @@ namespace CRFPP {
               float C,
               double eta,
               unsigned short shrinking_size,
-              unsigned short thread_num) {
+              unsigned short thread_num,
+              bool orthant) {
     double old_obj = 1e+37;
     int    converge = 0;
     LBFGS lbfgs;
@@ -186,9 +187,30 @@ namespace CRFPP {
           thread[0].expected[k] += thread[i].expected[k];
       }
 
-      for (size_t k = 0; k < feature_index->size(); ++k) {
-        thread[0].obj += (alpha[k] * alpha[k] /(2.0 * C));
-        thread[0].expected[k] += alpha[k] / C;
+      size_t num_nonzero = 0;
+      if (orthant) {   // L1
+        for (size_t k = 0; k < feature_index->size(); ++k) {
+          if (alpha[k] == 0.0) {
+            double grad_neg = thread[0].expected[k] - 1.0 / C;
+            double grad_pos = thread[0].expected[k] + 1.0 / C;
+            if (grad_neg > 0.0) {
+              thread[0].expected[k] = grad_neg;
+            } else if (grad_pos < 0.0) {
+              thread[0].expected[k] = grad_pos;
+            } else {
+              thread[0].expected[k] = 0.0;
+            }
+          } else {
+            thread[0].expected[k] += 1.0 * sigma(alpha[k]) / C;
+          }
+          if (alpha[k] != 0.0) ++num_nonzero;
+        }
+      } else {
+        num_nonzero = feature_index->size();
+        for (size_t k = 0; k < feature_index->size(); ++k) {
+          thread[0].obj += (alpha[k] * alpha[k] /(2.0 * C));
+          thread[0].expected[k] += alpha[k] / C;
+        }
       }
 
       double diff = (itr == 0 ? 1.0 :
@@ -196,6 +218,7 @@ namespace CRFPP {
       std::cout << "iter="  << itr
                 << " terr=" << 1.0 * thread[0].err / all
                 << " serr=" << 1.0 * thread[0].zeroone / x.size()
+                << " act=" << num_nonzero
                 << " obj=" << thread[0].obj
                 << " diff="  << diff << std::endl;
       old_obj = thread[0].obj;
@@ -210,7 +233,7 @@ namespace CRFPP {
       if (lbfgs.optimize(feature_index->size(),
 			 &alpha[0],
                          thread[0].obj,
-                         &thread[0].expected[0]) <= 0)
+                         &thread[0].expected[0], orthant) <= 0)
         return false;
     }
 
@@ -249,7 +272,7 @@ namespace CRFPP {
       << "This architecture doesn't support multi-thrading";
 #endif
 
-    CHECK_FALSE(algorithm == CRF ||
+    CHECK_FALSE(algorithm == CRF_L2 || algorithm == CRF_L1 ||
                 (algorithm == MIRA && thread_num == 1))
                   <<  "MIRA doesn't support multi-thrading";
 
@@ -310,9 +333,6 @@ namespace CRFPP {
     std::cout << "C:                   " << C << std::endl;
     std::cout << "shrinking size:      " << shrinking_size
               << std::endl;
-    std::cout << "Algorithm:           "
-              << ((algorithm == CRF) ? "CRF" : "MIRA")
-              << std::endl << std::endl;
 
     progress_timer pg;
 
@@ -322,10 +342,15 @@ namespace CRFPP {
                    maxitr, C, eta, shrinking_size, thread_num))
         WHAT_ERROR("MIRA execute error");
       break;
-    case CRF:
+    case CRF_L2:
       if (!runCRF(x, &feature_index, &alpha[0],
-                  maxitr, C, eta, shrinking_size, thread_num))
-        WHAT_ERROR("CRF execute error");
+                  maxitr, C, eta, shrinking_size, thread_num, false))
+        WHAT_ERROR("CRF_L2 execute error");
+      break;
+    case CRF_L1:
+      if (!runCRF(x, &feature_index, &alpha[0],
+                  maxitr, C, eta, shrinking_size, thread_num, true))
+        WHAT_ERROR("CRF_L1 execute error");
       break;
     }
 
@@ -393,8 +418,10 @@ int crfpp_learn(int argc, char **argv) {
   toLower(&salgo);
 
   int algorithm = CRFPP::Encoder::MIRA;
-  if (salgo == "crf") {
-    algorithm = CRFPP::Encoder::CRF;
+  if (salgo == "crf" || salgo == "crf-l2") {
+    algorithm = CRFPP::Encoder::CRF_L2;
+  } else if (salgo == "crf-l1") {
+    algorithm = CRFPP::Encoder::CRF_L1;
   } else if (salgo == "mira") {
     algorithm = CRFPP::Encoder::MIRA;
   } else {
