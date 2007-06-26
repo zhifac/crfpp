@@ -35,7 +35,7 @@
 
 namespace {
   static const double ftol = 1e-4;
-  static const double xtol = 1e-7;
+  static const double xtol = 1e-16;
   static const double eps  = 1e-7;
   static const double lb3_1_gtol = 0.9;
   static const double lb3_1_stpmin = 1e-20;
@@ -246,7 +246,7 @@ namespace CRFPP {
                 double *x,
                 double f, const double *g, double *s,
                 double *stp,
-                int *info, int *nfev, double *wa, bool orthant) {
+                int *info, int *nfev, double *wa, bool orthant, double C) {
       static const double p5 = 0.5;
       static const double p66 = 0.66;
       static const double xtrapf = 4.0;
@@ -304,8 +304,24 @@ namespace CRFPP {
 
         if (orthant) {
           for (int j = 1; j <= size; ++j) {
-            double p = pi(s[j], -g[j]);
-            double eta = wa[j] == 0 ? sigma(-g[j]) : sigma(wa[j]);
+            double grad_neg = 0.0;
+            double grad_pos = 0.0;
+            double grad = 0.0;
+            if (wa[j] == 0.0) {
+              grad_neg = g[j] - 1.0 / C;
+              grad_pos = g[j] + 1.0 / C;
+            } else {
+              grad_pos = grad_neg = g[j] + 1.0 * sigma(wa[j]) / C;
+            }
+            if (grad_neg > 0.0) {
+              grad = grad_neg;
+            } else if (grad_pos < 0.0) {
+              grad = grad_pos;
+            } else {
+              grad = 0.0;
+            }
+            const double p = pi(s[j], -grad);
+            const double eta = wa[j] == 0 ? sigma(-grad) : sigma(wa[j]);
             x[j] = pi(wa[j] + *stp * p, eta);
           }
         } else {
@@ -399,6 +415,7 @@ namespace CRFPP {
                              double *diag,
                              double *w,
                              bool orthant,
+                             double C,
                              int *iflag) {
     double yy = 0.0;
     double ys = 0.0;
@@ -502,7 +519,7 @@ namespace CRFPP {
 
     L172:
       mcsrch_->mcsrch(size, &x[1], f, &g[1], &w[ispt + point * size + 1],
-                      &stp, &info, &nfev, &diag[1], orthant);
+                      &stp, &info, &nfev, &diag[1], orthant, C);
       if (info == -1) {
         *iflag = 1;  // next value
         return;

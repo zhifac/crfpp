@@ -189,20 +189,11 @@ namespace CRFPP {
 
       size_t num_nonzero = 0;
       if (orthant) {   // L1
+        // use the non-reguralized gradinent & object value
+        // for lbfgs. Inside the lbfgs routine, we caculate
+        // psudo gradient from the alpha, obj, and gradient
         for (size_t k = 0; k < feature_index->size(); ++k) {
-          if (alpha[k] == 0.0) {
-            double grad_neg = thread[0].expected[k] - 1.0 / C;
-            double grad_pos = thread[0].expected[k] + 1.0 / C;
-            if (grad_neg > 0.0) {
-              thread[0].expected[k] = grad_neg;
-            } else if (grad_pos < 0.0) {
-              thread[0].expected[k] = grad_pos;
-            } else {
-              thread[0].expected[k] = 0.0;
-            }
-          } else {
-            thread[0].expected[k] += 1.0 * sigma(alpha[k]) / C;
-          }
+          thread[0].obj += std::abs(alpha[k] / C);
           if (alpha[k] != 0.0) ++num_nonzero;
         }
       } else {
@@ -233,7 +224,7 @@ namespace CRFPP {
       if (lbfgs.optimize(feature_index->size(),
 			 &alpha[0],
                          thread[0].obj,
-                         &thread[0].expected[0], orthant) <= 0)
+                         &thread[0].expected[0], orthant, C) <= 0)
         return false;
     }
 
