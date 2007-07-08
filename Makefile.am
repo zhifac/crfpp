@@ -1,4 +1,4 @@
-EXTRA_DIST = README Makefile.msvc.in model
+EXTRA_DIST = README Makefile.msvc.in
 EXTRA_DIRS = doc example sdk perl python ruby java swig
 bin_PROGRAMS = crf_learn crf_test
 
@@ -84,9 +84,7 @@ script-clean:
 	(cd java; $(MAKE) clean;)
 
 export-package:
-	scp CRF++-@VERSION@.tar.gz   chasen.org:public_html/software/CRF++/src
-	scp CRF++-@VERSION@.zip      chasen.org:public_html/software/CRF++/win
-	scp doc/*.html               chasen.org:public_html/software/CRF++/	
-	scp doc/*.css                chasen.org:public_html/software/CRF++/	
-
-
+	./upload.pl -p crfpp -n crfpp        -r @VERSION@ -f CRF++-@VERSION@.tar.gz
+	./upload.pl -p crfpp -n crfpp-win32  -r @VERSION@ -f CRF++-@VERSION@.zip
+	scp doc/*.html sf:public_html/crfpp/
+	scp doc/*.css sf:public_html/crfpp/

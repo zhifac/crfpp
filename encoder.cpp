@@ -189,9 +189,6 @@ namespace CRFPP {
 
       size_t num_nonzero = 0;
       if (orthant) {   // L1
-        // use the non-reguralized gradinent & object value
-        // for lbfgs. Inside the lbfgs routine, we caculate
-        // psudo gradient from the alpha, obj, and gradient
         for (size_t k = 0; k < feature_index->size(); ++k) {
           thread[0].obj += std::abs(alpha[k] / C);
           if (alpha[k] != 0.0) ++num_nonzero;

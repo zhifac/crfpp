@@ -321,8 +321,8 @@ namespace CRFPP {
               grad = 0.0;
             }
             const double p = pi(s[j], -grad);
-            const double eta = wa[j] == 0 ? sigma(-grad) : sigma(wa[j]);
-            x[j] = pi(wa[j] + *stp * p, eta);
+            const double xi = wa[j] == 0.0 ? sigma(-grad) : sigma(wa[j]);
+            x[j] = pi(wa[j] + *stp * p, xi);
           }
         } else {
           for (int j = 1; j <= size; ++j) {

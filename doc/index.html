@@ -66,7 +66,12 @@
 
     <h2><a name="news">News</a></h2>
     <ul>
-    <strong>2007-03-07</strong>: <a href="#download">CRF++ 0.47</a> Released<br>
+    <strong>2007-07-07</strong>: <a href="#download">CRF++ 0.48</a> Released<br>
+    <ul>
+     <li>Support L1-CRF. use -a CRF-L1 option to enable L1 regularization.
+    </ul>  
+
+    <strong>2007-03-07</strong>: CRF++ 0.47 Released<br>
     <ul>
      <li>Fixed a bug in MIRA training
     </ul>  
@@ -501,8 +506,13 @@ iter=8 terr=0.06228 serr=0.59174 obj=3742.93171 diff=0.18953
 </ul>
 
 <p>
-There are two major parameters to control the training condition
+There are 4 major parameters to control the training condition
 <ul>
+ <li>-a CRF-L2 or CRF-L1:<br>
+     Changing the regularization algorithm. Default setting is L2.
+     Generally speaking, L2 performs slightly better than L1, while
+     the number of non-zero features in L1 is drastically smaller than
+     that in L2.
  <li>-c float: <br>
      With this option, you can change the hyper-parameter for the CRFs.
      With larger C value, CRF tends to overfit to the give training corpus.
