@@ -219,7 +219,7 @@ namespace CRFPP {
       if (itr > maxitr || converge == 3)  break;  // 3 is ad-hoc
 
       if (lbfgs.optimize(feature_index->size(),
-			 &alpha[0],
+                         &alpha[0],
                          thread[0].obj,
                          &thread[0].expected[0], orthant, C) <= 0)
         return false;
