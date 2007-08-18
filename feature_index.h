@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef _CRFPP_FEATURE_INDEX_H
-#define _CRFPP_FEATURE_INDEX_H
+#ifndef CRFPP_FEATURE_INDEX_H__
+#define CRFPP_FEATURE_INDEX_H__
 
 #include <vector>
 #include <map>

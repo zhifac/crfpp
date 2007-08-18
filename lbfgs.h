@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef CRFPP_LBFGS_H_
-#define CRFPP_LBFGS_H_
+#ifndef CRFPP_LBFGS_H__
+#define CRFPP_LBFGS_H__
 
 #include <vector>
 #include <iostream>

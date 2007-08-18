@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef _CRFPP_THREAD_PTR_H
-#define _CRFPP_THREAD_PTR_H
+#ifndef CRFPP_THREAD_H__
+#define CRFPP_THREAD_H__
 
 #ifdef HAVE_PTHREAD_H
 #include <pthread.h>

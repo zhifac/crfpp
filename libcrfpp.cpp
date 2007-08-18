@@ -81,6 +81,12 @@ if (!(c) || (c)->allocated != LIBCRFPP_ID) { \
   return 0; \
 } CRFPP::Tagger *(t) = (c)->ptr;
 
+#define CRFPP_CHECK_FIRST_ARG_VOID(c, t)  \
+if (!(c) || (c)->allocated != LIBCRFPP_ID) { \
+  errorStr = "first argment seems to be invalid"; \
+  return; \
+} CRFPP::Tagger *(t) = (c)->ptr;
+
 bool     crfpp_add2(crfpp_t* c, size_t s, const char **line) {
   CRFPP_CHECK_FIRST_ARG(c, t);
   return t->add(s, line);
@@ -262,4 +268,34 @@ const char*  crfpp_tostr(crfpp_t* c) {
 const char*  crfpp_tostr2(crfpp_t* c, char *ostr, size_t len) {
   CRFPP_CHECK_FIRST_ARG(c, t);
   return t->toString(ostr, len);
+}
+
+void crfpp_set_vlevel(crfpp_t *c, unsigned int vlevel) {
+  CRFPP_CHECK_FIRST_ARG_VOID(c, t);
+  t->set_vlevel(vlevel);
+}
+
+unsigned int crfpp_vlevel(crfpp_t *c) {
+  CRFPP_CHECK_FIRST_ARG(c, t);
+  return t->vlevel();
+}
+
+void crfpp_set_cost_factor(crfpp_t *c, float cost_factor) {
+  CRFPP_CHECK_FIRST_ARG_VOID(c, t);
+  t->set_cost_factor(cost_factor);
+}
+
+float crfpp_cost_factor(crfpp_t *c) {
+  CRFPP_CHECK_FIRST_ARG(c, t);
+  return t->cost_factor();
+}
+
+void crfpp_set_nbest(crfpp_t *c, size_t nbest) {
+  CRFPP_CHECK_FIRST_ARG_VOID(c, t);
+  t->set_nbest(nbest);
+}
+
+size_t crfpp_nbest(crfpp_t *c) {
+  CRFPP_CHECK_FIRST_ARG(c, t);
+  return t->nbest();
 }

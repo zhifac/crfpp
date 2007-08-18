@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef CRFPP_MMAP_H
-#define CRFPP_MMAP_H
+#ifndef CRFPP_MMAP_H__
+#define CRFPP_MMAP_H__
 
 #include <errno.h>
 #include <string>

@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef _CRFPP_SCOPED_PTR_H
-#define _CRFPP_SCOPED_PTR_H
+#ifndef CRFPP_SCOPED_PTR_H__
+#define CRFPP_SCOPED_PTR_H__
 
 #include <cstring>
 #include <string>

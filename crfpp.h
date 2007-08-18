@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef CRFPP_CRFPP_H
-#define CRFPP_CRFPP_H
+#ifndef CRFPP_CRFPP_H__
+#define CRFPP_CRFPP_H__
 
 /* C interface  */
 #ifdef __cplusplus
@@ -84,6 +84,12 @@ extern "C" {
                                                    size_t, char *, size_t);
   CRFPP_DLL_EXTERN const char*  crfpp_tostr(crfpp_t*);
   CRFPP_DLL_EXTERN const char*  crfpp_tostr2(crfpp_t*, char *, size_t);
+
+  CRFPP_DLL_EXTERN void crfpp_set_vlevel(crfpp_t *, unsigned int);
+  CRFPP_DLL_EXTERN unsigned int crfpp_vlevel(crfpp_t *);
+  CRFPP_DLL_EXTERN void crfpp_set_cost_factor(crfpp_t *, float);
+  CRFPP_DLL_EXTERN float crfpp_cost_factor(crfpp_t *);
+  CRFPP_DLL_EXTERN void crfpp_set_nbest(crfpp_t *, size_t);
 #endif
 
 #ifdef __cplusplus
@@ -114,6 +120,24 @@ namespace CRFPP {
     // return parameter vector. the size should be dsize();
     virtual const float *weight_vector() const = 0;
 #endif
+
+    // set vlevel
+    virtual void set_vlevel(unsigned int vlevel) = 0;
+
+    // get vlevel
+    virtual unsigned int vlevel() const = 0;
+
+    // set cost factor
+    virtual void set_cost_factor(float cost_factor) = 0;
+
+    // get cost factor
+    virtual float cost_factor() const = 0;
+
+    // set nbest
+    virtual void set_nbest(size_t nbest) = 0;
+
+    // get nbest
+    virtual size_t nbest() const = 0;
 
     // add one line to the current context
     virtual bool add(const char* str) = 0;

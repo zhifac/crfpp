@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef _CRFPP_FREELIST_H
-#define _CRFPP_FREELIST_H
+#ifndef CRFPP_FREELIST_H__
+#define CRFPP_FREELIST_H__
 
 #include <vector>
 

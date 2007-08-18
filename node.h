@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef _CRFPP_NODE_H
-#define _CRFPP_NODE_H
+#ifndef CRFPP_NODE_H__
+#define CRFPP_NODE_H__
 
 #include <vector>
 #include <cmath>

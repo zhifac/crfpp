@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef _CRFPP_LEANER_H
-#define _CRFPP_LEANER_H
+#ifndef CRFPP_ENCODER_H__
+#define CRFPP_ENCODER_H__
 
 #include "common.h"
 

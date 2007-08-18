@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef _CRFPP_TAGGER_H
-#define _CRFPP_TAGGER_H
+#ifndef CRFPP_TAGGER_H__
+#define CRFPP_TAGGER_H__
 
 #include <iostream>
 #include <vector>
@@ -145,6 +145,27 @@ namespace CRFPP {
     bool parse();
     bool clear();
     bool next();
+
+    unsigned int vlevel() const { return vlevel_; }
+
+    float cost_factor() const {
+      return feature_index_->cost_factor();
+    }
+
+    size_t nbest() const { return nbest_; }
+
+    void set_vlevel(unsigned int vlevel) {
+      vlevel_ = vlevel;
+    }
+
+    void set_cost_factor(float cost_factor) {
+      if (cost_factor > 0)
+        feature_index_->set_cost_factor(cost_factor);
+    }
+
+    void set_nbest(size_t nbest) {
+      nbest_ = nbest;
+    }
 
     const char* what() { return what_.str(); }
   };

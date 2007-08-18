@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef _CRFPP_COMMON_H
-#define _CRFPP_COMMON_H
+#ifndef CRFPP_COMMON_H__
+#define CRFPP_COMMON_H__
 
 #include <setjmp.h>
 #include <cstdlib>

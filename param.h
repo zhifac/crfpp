@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef CRFPP_PARAM_H
-#define CRFPP_PARAM_H
+#ifndef CRFPP_PARAM_H__
+#define CRFPP_PARAM_H__
 
 #include <map>
 #include <string>
