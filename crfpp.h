@@ -1,10 +1,10 @@
-//
-//  CRF++ -- Yet Another CRF toolkit
-//
-//  $Id: crfpp.h 1592 2007-02-12 09:40:53Z taku $;
-//
-//  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
-//
+/*
+  CRF++ -- Yet Another CRF toolkit
+
+  $Id: crfpp.h 1592 2007-02-12 09:40:53Z taku $;
+
+  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
+*/
 #ifndef CRFPP_CRFPP_H__
 #define CRFPP_CRFPP_H__
 

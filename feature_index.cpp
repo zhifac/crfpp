@@ -231,7 +231,7 @@ namespace CRFPP {
       if (std::strcmp(column[0], "maxid:") == 0)
         maxid_ = std::atoi(column[1]);
     }
-
+     
     CHECK_FALSE(maxid_ > 0) << "maxid is not defined: " << filename1;
 
     CHECK_FALSE(xsize_ > 0) << "xsize is not defined: " << filename1;
@@ -330,7 +330,9 @@ namespace CRFPP {
     bofs.write(reinterpret_cast<char *>(&cost_factor_), sizeof(cost_factor_));
     bofs.write(reinterpret_cast<char *>(&maxid_), sizeof(maxid_));
 
-    xsize_ = _min(xsize_, max_xsize_);
+    if (max_xsize_ > 0) {
+      xsize_ = _min(xsize_, max_xsize_);
+    }
     bofs.write(reinterpret_cast<char *>(&xsize_), sizeof(xsize_));
     unsigned int dsize = da.unit_size() * da.size();
     bofs.write(reinterpret_cast<char *>(&dsize), sizeof(dsize));

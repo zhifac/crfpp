@@ -2078,7 +2078,7 @@ fi
 
 PACKAGE=CRF++
 
-VERSION=0.49
+VERSION=0.50
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { { echo "$as_me:$LINENO: error: source directory already configured; run \"make distclean\" there first" >&5
