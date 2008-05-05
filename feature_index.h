@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef CRFPP_FEATURE_INDEX_H__
-#define CRFPP_FEATURE_INDEX_H__
+#ifndef CRFPP_FEATURE_INDEX_H_
+#define CRFPP_FEATURE_INDEX_H_
 
 #include <vector>
 #include <map>
@@ -57,9 +57,9 @@ namespace CRFPP {
     const char* y(size_t i) const { return y_[i]; }
     void   set_alpha(double *alpha) { alpha_ = alpha; }
     const float *alpha_float() { return const_cast<float *>(alpha_float_); }
-    const double *alpha() { return const_cast<double *>(alpha_); }
+    const double *alpha() const { return const_cast<double *>(alpha_); }
     void set_cost_factor(double cost_factor) { cost_factor_ = cost_factor; }
-    double cost_factor() { return cost_factor_; }
+    double cost_factor() const { return cost_factor_; }
     char *strdup(const char *);
     void calcCost(Node *);
     void calcCost(Path *);

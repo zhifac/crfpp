@@ -29,8 +29,8 @@ namespace CRFPP {
     beta += cost;
   }
 
-  void Node::calcExpectation(double *expected, double Z, size_t size) {
-    double c = std::exp(alpha + beta - cost - Z);
+  void Node::calcExpectation(double *expected, double Z, size_t size) const {
+    const double c = std::exp(alpha + beta - cost - Z);
     for (int *f = fvector; *f != -1; ++f) expected[*f + y] += c;
     for (const_Path_iterator it = lpath.begin(); it != lpath.end(); ++it)
       (*it)->calcExpectation(expected, Z, size);

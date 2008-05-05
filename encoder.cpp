@@ -291,14 +291,15 @@ namespace CRFPP {
       while (ifs) {
         TaggerImpl *_x = new TaggerImpl();
         _x->open(&feature_index);
-        _x->set_thread_id(line % thread_num);
         if (!_x->read(&ifs) || !_x->shrink())
           WHAT_ERROR(_x->what());
-
+	 
         if (!_x->empty())
           x.push_back(_x);
         else
           delete _x;
+	 
+        _x->set_thread_id(line % thread_num);
 
         if (++line % 100 == 0) std::cout << line << ".. " << std::flush;
       }
@@ -385,7 +386,7 @@ int crfpp_learn(int argc, char **argv) {
 
   if (!param.help_version()) return 0;
 
-  bool convert = param.get<bool>("convert");
+  const bool convert = param.get<bool>("convert");
 
   const std::vector<std::string> &rest = param.rest_args();
   if (param.get<bool>("help") ||
@@ -394,13 +395,13 @@ int crfpp_learn(int argc, char **argv) {
     return 0;
   }
 
-  size_t         freq           = param.get<int>("freq");
-  size_t         maxiter        = param.get<int>("maxiter");
-  double         C              = param.get<float>("cost");
-  double         eta            = param.get<float>("eta");
-  bool           textmodel      = param.get<bool>("textmodel");
-  unsigned short thread         = param.get<unsigned short>("thread");
-  unsigned short shrinking_size = param.get<unsigned short>("shrinking-size");
+  const size_t         freq           = param.get<int>("freq");
+  const size_t         maxiter        = param.get<int>("maxiter");
+  const double         C              = param.get<float>("cost");
+  const double         eta            = param.get<float>("eta");
+  const bool           textmodel      = param.get<bool>("textmodel");
+  const unsigned short thread         = param.get<unsigned short>("thread");
+  const unsigned short shrinking_size = param.get<unsigned short>("shrinking-size");
   std::string salgo = param.get<std::string>("algorithm");
 
   toLower(&salgo);

@@ -231,7 +231,7 @@ namespace CRFPP {
       if (std::strcmp(column[0], "maxid:") == 0)
         maxid_ = std::atoi(column[1]);
     }
-     
+
     CHECK_FALSE(maxid_ > 0) << "maxid is not defined: " << filename1;
 
     CHECK_FALSE(xsize_ > 0) << "xsize is not defined: " << filename1;

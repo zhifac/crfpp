@@ -24,7 +24,6 @@ namespace CRFPP {
 
   class TaggerImpl : public Tagger {
   private:
-
     struct QueueElement {
       Node *node;
       QueueElement *next;
@@ -49,10 +48,10 @@ namespace CRFPP {
     size_t                            feature_id_;
     unsigned short                    thread_id_;
     FeatureIndex                     *feature_index_;
-    std::vector <std::vector <const char *> > x_;
-    std::vector <std::vector <Node *> > node_;
-    std::vector <unsigned short int>  answer_;
-    std::vector <unsigned short int>  result_;
+    std::vector<std::vector <const char *> > x_;
+    std::vector<std::vector <Node *> > node_;
+    std::vector<unsigned short int>  answer_;
+    std::vector<unsigned short int>  result_;
     whatlog what_;
     string_buffer os_;
 
@@ -75,8 +74,8 @@ namespace CRFPP {
     void   set_feature_id(size_t id) { feature_id_  = id; }
     size_t feature_id() const { return feature_id_; }
     void   set_thread_id(unsigned short id) { thread_id_ = id; }
-    unsigned short thread_id() { return thread_id_; }
-    Node  *node(size_t i, size_t j) { return node_[i][j]; }
+    unsigned short thread_id() const { return thread_id_; }
+    Node  *node(size_t i, size_t j) const { return node_[i][j]; }
     void   set_node(Node *n, size_t i, size_t j) { node_[i][j] = n; }
 
     int          eval();

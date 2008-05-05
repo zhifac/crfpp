@@ -5,10 +5,11 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef CRFPP_FREELIST_H__
-#define CRFPP_FREELIST_H__
+#ifndef CRFPP_FREELIST_H_
+#define CRFPP_FREELIST_H_
 
 #include <vector>
+#include <cstring>
 
 namespace CRFPP {
   template <class T>

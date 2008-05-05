@@ -5,12 +5,11 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef CRFPP_PATH_H__
-#define CRFPP_PATH_H__
+#ifndef CRFPP_PATH_H_
+#define CRFPP_PATH_H_
 
 #include <vector>
 #include "node.h"
-
 
 namespace CRFPP {
   struct Node;
@@ -24,7 +23,7 @@ namespace CRFPP {
     Path(): rnode(0), lnode(0), fvector(0), cost(0.0) {}
 
     // for CRF
-    void calcExpectation(double *expected, double, size_t);
+    void calcExpectation(double *expected, double, size_t) const;
     void add(Node *_lnode, Node *_rnode) ;
 
     void clear() {

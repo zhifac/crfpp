@@ -23,8 +23,8 @@ namespace CRFPP {
   // log(exp (x) + exp(y) + exp(z))
   inline double logsumexp(double x, double y, bool flg) {
     if (flg) return y;  // init mode
-    double vmin = _min(x, y);
-    double vmax = _max(x, y);
+    const double vmin = _min(x, y);
+    const double vmax = _max(x, y);
     if (vmax > vmin + MINUS_LOG_EPSILON) {
       return vmax;
     } else {
@@ -48,7 +48,7 @@ namespace CRFPP {
 
     void calcAlpha();
     void calcBeta();
-    void calcExpectation(double *expected, double, size_t);
+    void calcExpectation(double *expected, double, size_t) const;
 
     void clear() {
       x = y = 0;

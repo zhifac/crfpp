@@ -1,29 +1,27 @@
-/*
-  MeCab -- Yet Another Part-of-Speech and Morphological Analyzer
-
-  $Id: lbfgs.c 1528 2006-08-07 02:39:50Z taku $;
-
-  lbfgs.c was ported from the FORTRAN code of lbfgs.m to C
-  using f2c converter
-
-  http://www.ece.northwestern.edu/~nocedal/lbfgs.html
-
-  Software for Large-scale Unconstrained Optimization
-  L-BFGS is a limited-memory quasi-Newton code for unconstrained optimization.
-  The code has been developed at the Optimization Technology Center,
-  a joint venture of Argonne National Laboratory and Northwestern University.
-
-  Authors
-  Jorge Nocedal
-
-  References
-  - J. Nocedal. Updating Quasi-Newton Matrices with Limited Storage(1980),
-  Mathematics of Computation 35, pp. 773-782.
-  - D.C. Liu and J. Nocedal. On the Limited Memory Method for
-  Large Scale Optimization(1989),
-  Mathematical Programming B, 45, 3, pp. 503-528.
-*/
-
+//   MeCab -- Yet Another Part-of-Speech and Morphological Analyzer
+//
+//   $Id: lbfgs.c 1528 2006-08-07 02:39:50Z taku $;
+//
+//   lbfgs.c was ported from the FORTRAN code of lbfgs.m to C
+//   using f2c converter
+//
+//   http://www.ece.northwestern.edu/~nocedal/lbfgs.html
+//
+//   Software for Large-scale Unconstrained Optimization
+//   L-BFGS is a limited-memory quasi-Newton code for unconstrained
+//   optimization.
+//   The code has been developed at the Optimization Technology Center,
+//   a joint venture of Argonne National Laboratory and Northwestern University.
+//
+//   Authors
+//   Jorge Nocedal
+//
+//   References
+//   - J. Nocedal. Updating Quasi-Newton Matrices with Limited Storage(1980),
+//   Mathematics of Computation 35, pp. 773-782.
+//   - D.C. Liu and J. Nocedal. On the Limited Memory Method for
+//   Large Scale Optimization(1989),
+//   Mathematical Programming B, 45, 3, pp. 503-528.
 #include "lbfgs.h"
 #include "common.h"
 #include <cmath>

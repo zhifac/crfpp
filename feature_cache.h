@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef CRFPP_FEATURE_CACHE_H__
-#define CRFPP_FEATURE_CACHE_H__
+#ifndef CRFPP_FEATURE_CACHE_H_
+#define CRFPP_FEATURE_CACHE_H_
 
 #include <vector>
 #include <map>
