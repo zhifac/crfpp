@@ -22,8 +22,8 @@
 #include "config.h"
 #endif
 
-#define COPYRIGHT  "CRF++: Yet Another CRF Tool Kit\nCopyright(C)" \
-"2005-2007 Taku Kudo, All rights reserved.\n"
+#define COPYRIGHT  "CRF++: Yet Another CRF Tool Kit\nCopyright (C) " \
+"2005-2008 Taku Kudo, All rights reserved.\n"
 #define MODEL_VERSION 100
 
 #if defined(_WIN32) && !defined(__CYGWIN__)

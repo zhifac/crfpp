@@ -17,21 +17,23 @@
 
 namespace CRFPP {
 
-  template <class Target, class Source>
-  static Target lexical_cast(Source arg) {
-    std::strstream interpreter;
-    Target result;
-    if (!(interpreter << arg) || !(interpreter >> result) ||
-        !(interpreter >> std::ws).eof()) {
-      scoped_ptr<Target> r(new Target());  // return default value
-      return *r;
+  namespace {
+    template <class Target, class Source>
+    Target lexical_cast(Source arg) {
+      std::strstream interpreter;
+      Target result;
+      if (!(interpreter << arg) || !(interpreter >> result) ||
+          !(interpreter >> std::ws).eof()) {
+        scoped_ptr<Target> r(new Target());  // return default value
+        return *r;
+      }
+      return result;
     }
-    return result;
-  }
 
-  template <>
-  static std::string lexical_cast<std::string, std::string>(std::string arg) {
-    return arg;
+    template <>
+    std::string lexical_cast<std::string, std::string>(std::string arg) {
+      return arg;
+    }
   }
 
   struct Option {
