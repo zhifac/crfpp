@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Getopt::Std;
 use WWW::Mechanize;
-use Net::FTP;
+# use Net::FTP;
 use POSIX qw(strftime);
 
 my %arg;
@@ -37,12 +37,13 @@ usage () if ($arg{"h"} ||
 	     !$file_name ||
              ! -f $file_name);
 
-my $ftp = Net::FTP->new("upload.sourceforge.net", Debug => 1);
-$ftp->login("anonymous",'anonymous@gmail.com');
-$ftp->cwd("/incoming");
-$ftp->binary();
-$ftp->put("$file_name");
-$ftp->quit;
+# my $ftp = Net::FTP->new("upload.sourceforge.net", Debug => 1);
+# $ftp->login("anonymous",'anonymous@gmail.com');
+# $ftp->cwd("/incoming");
+# $ftp->binary();
+# $ftp->put("$file_name");
+# $ftp->quit;
+system("rsync -auvP -e ssh $file_name $user\@frs.sourceforge.net:uploads");
 sleep(20);
 
 my $mech = new WWW::Mechanize(autocheck => 1);
