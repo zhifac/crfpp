@@ -19,7 +19,7 @@
 #define LIBCRFPP_ID 113212
 
 namespace {
-  std::string errorStr;
+std::string errorStr;
 }
 
 struct crfpp_t {
@@ -75,17 +75,17 @@ void crfpp_destroy(crfpp_t *c) {
   c = 0;
 }
 
-#define CRFPP_CHECK_FIRST_ARG(c, t)  \
-if (!(c) || (c)->allocated != LIBCRFPP_ID) { \
-  errorStr = "first argment seems to be invalid"; \
-  return 0; \
-} CRFPP::Tagger *(t) = (c)->ptr;
+#define CRFPP_CHECK_FIRST_ARG(c, t)                     \
+  if (!(c) || (c)->allocated != LIBCRFPP_ID) {          \
+    errorStr = "first argment seems to be invalid";     \
+    return 0;                                           \
+  } CRFPP::Tagger *(t) = (c)->ptr;
 
-#define CRFPP_CHECK_FIRST_ARG_VOID(c, t)  \
-if (!(c) || (c)->allocated != LIBCRFPP_ID) { \
-  errorStr = "first argment seems to be invalid"; \
-  return; \
-} CRFPP::Tagger *(t) = (c)->ptr;
+#define CRFPP_CHECK_FIRST_ARG_VOID(c, t)                \
+  if (!(c) || (c)->allocated != LIBCRFPP_ID) {          \
+    errorStr = "first argment seems to be invalid";     \
+    return;                                             \
+  } CRFPP::Tagger *(t) = (c)->ptr;
 
 bool     crfpp_add2(crfpp_t* c, size_t s, const char **line) {
   CRFPP_CHECK_FIRST_ARG(c, t);

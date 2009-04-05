@@ -11,23 +11,23 @@
 #include "common.h"
 
 namespace CRFPP {
-  class Encoder {
-  private:
-    whatlog what_;
+class Encoder {
+ private:
+  whatlog what_;
 
-  public:
-    enum { CRF_L2, CRF_L1, MIRA };
-    bool learn(const char *, const char *,
-               const char *,
-               bool, size_t, size_t,
-               double, double,
-               unsigned short,
-               unsigned short, int);
+ public:
+  enum { CRF_L2, CRF_L1, MIRA };
+  bool learn(const char *, const char *,
+             const char *,
+             bool, size_t, size_t,
+             double, double,
+             unsigned short,
+             unsigned short, int);
 
-    bool convert(const char *text_file,
-                 const char* binary_file);
+  bool convert(const char *text_file,
+               const char* binary_file);
 
-    const char* what() { return what_.str(); }
-  };
+  const char* what() { return what_.str(); }
+};
 }
 #endif
