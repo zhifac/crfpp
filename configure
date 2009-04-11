@@ -2251,7 +2251,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=CRF++
- VERSION=0.51
+ VERSION=0.52
 
 
 cat >>confdefs.h <<_ACEOF
@@ -16244,8 +16244,8 @@ echo "$as_me: error: \"SUN make does not work for building maxent. Please instal
 fi
 
 if test -n "$GCC"; then
-   CFLAGS="-O3 -Wall -Wno-deprecated"
-   CXXFLAGS="-O3 -Wall -Wno-deprecated"
+   CFLAGS="-O3 -Wall";
+   CXXFLAGS="-O3 -Wall";
 fi
 
 
@@ -17360,7 +17360,6 @@ main ()
    }
    catch (char *e) {
    }
-
    catch (...) {
    }
 

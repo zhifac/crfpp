@@ -10,7 +10,7 @@
 #include <iterator>
 #include <cmath>
 #include <string>
-#include <strstream>
+#include <sstream>
 #include "stream_wrapper.h"
 #include "common.h"
 #include "tagger.h"
@@ -410,7 +410,7 @@ const char* TaggerImpl::parse(const char* input) {
 }
 
 const char* TaggerImpl::parse(const char* input, size_t length) {
-  std::istrstream is(input, length);
+  std::istringstream is(std::string(input, length));
   if (!read(&is) || !parse()) return 0;
   toString();
   return os_.c_str();
@@ -418,10 +418,16 @@ const char* TaggerImpl::parse(const char* input, size_t length) {
 
 const char* TaggerImpl::parse(const char*input, size_t len1,
                               char *output, size_t len2) {
-  std::istrstream is(input, len1);
-  std::ostrstream os(output, len2);
-  if (!parse_stream(&is, &os)) return false;
-  return output;
+  std::istringstream is(std::string(input, len1));
+  if (x_.empty()) return 0;
+  toString();
+  if ((os_.size() + 1) < len2) {
+    memcpy(output, os_.data(), os_.size());
+    output[os_.size()] = '\0';
+    return output;
+  } else {
+    return 0;
+  }
 }
 
 bool TaggerImpl::parse_stream(std::istream *is,

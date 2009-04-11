@@ -13,7 +13,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
-#include <strstream>
+#include <sstream>
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -233,10 +233,11 @@ class warn {
 };
 
 struct whatlog {
-  std::ostrstream stream_;
-  const char *str() {
-    stream_ << std::ends;
-    return stream_.str();
+  std::ostringstream stream_;
+  std::string str_;
+  const char* str() {
+    str_ = stream_.str();
+    return str_.c_str();
   }
   jmp_buf cond_;
 };

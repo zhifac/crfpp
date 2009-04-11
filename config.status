@@ -476,7 +476,7 @@ old_postinstall_cmds='chmod 644 $oldlib~$RANLIB $oldlib'
 old_postuninstall_cmds=''
 old_archive_cmds='$AR $AR_FLAGS $oldlib$oldobjs~$RANLIB $oldlib'
 CC='gcc'
-CFLAGS='-O3 -Wall -Wno-deprecated -mieee-fp'
+CFLAGS='-O3 -Wall -mieee-fp'
 compiler='g++'
 GCC='yes'
 lt_cv_sys_global_symbol_pipe='sed -n -e '\''s/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p'\'''
@@ -658,7 +658,7 @@ fi
 
 
     PACKAGE='CRF++'
-    VERSION='0.51'
+    VERSION='0.52'
     TIMESTAMP=''
     RM='rm -f'
     ofile='libtool'
@@ -779,7 +779,7 @@ s,@INSTALL_DATA@,|#_!!_#|${INSTALL} -m 644,g
 s,@am__isrc@,|#_!!_#|,g
 s,@CYGPATH_W@,|#_!!_#|echo,g
 s,@PACKAGE@,|#_!!_#|CRF++,g
-s,@VERSION@,|#_!!_#|0.51,g
+s,@VERSION@,|#_!!_#|0.52,g
 s,@ACLOCAL@,|#_!!_#|${SHELL} /home/taku/proj/crfpp/missing --run aclocal-1.10,g
 s,@AUTOCONF@,|#_!!_#|${SHELL} /home/taku/proj/crfpp/missing --run autoconf,g
 s,@AUTOMAKE@,|#_!!_#|${SHELL} /home/taku/proj/crfpp/missing --run automake-1.10,g
@@ -796,7 +796,7 @@ s,@AMTAR@,|#_!!_#|${SHELL} /home/taku/proj/crfpp/missing --run tar,g
 s,@am__tar@,|#_!!_#|${AMTAR} chof - "$$tardir",g
 s,@am__untar@,|#_!!_#|${AMTAR} xf -,g
 s,@CC@,|#_!!_#|gcc,g
-s,@CFLAGS@,|#_!!_#|-O3 -Wall -Wno-deprecated -mieee-fp,g
+s,@CFLAGS@,|#_!!_#|-O3 -Wall -mieee-fp,g
 s,@LDFLAGS@,|#_!!_#|,g
 s,@CPPFLAGS@,|#_!!_#|,g
 s,@ac_ct_CC@,|#_!!_#|gcc,g
@@ -812,7 +812,7 @@ s,@CCDEPMODE@,|#_!!_#|depmode=gcc3,g
 s,@am__fastdepCC_TRUE@,|#_!!_#|,g
 s,@am__fastdepCC_FALSE@,|#_!!_#|#,g
 s,@CXX@,|#_!!_#|g++,g
-s,@CXXFLAGS@,|#_!!_#|-O3 -Wall -Wno-deprecated -mieee-fp,g
+s,@CXXFLAGS@,|#_!!_#|-O3 -Wall -mieee-fp,g
 s,@ac_ct_CXX@,|#_!!_#|g++,g
 s,@CXXDEPMODE@,|#_!!_#|depmode=gcc3,g
 s,@am__fastdepCXX_TRUE@,|#_!!_#|,g
@@ -1113,7 +1113,7 @@ s,^\([	 #]*\)[^	 ]*\([	 ]*PACKAGE_VERSION\)[	 (].*,\1define\2 "" ,
 s,^\([	 #]*\)[^	 ]*\([	 ]*PACKAGE_STRING\)[	 (].*,\1define\2 "" ,
 s,^\([	 #]*\)[^	 ]*\([	 ]*PACKAGE_BUGREPORT\)[	 (].*,\1define\2 "" ,
 s,^\([	 #]*\)[^	 ]*\([	 ]*PACKAGE\)[	 (].*,\1define\2 "CRF++" ,
-s,^\([	 #]*\)[^	 ]*\([	 ]*VERSION\)[	 (].*,\1define\2 "0.51" ,
+s,^\([	 #]*\)[^	 ]*\([	 ]*VERSION\)[	 (].*,\1define\2 "0.52" ,
 s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_SYS_TYPES_H\)[	 (].*,\1define\2 1 ,
 s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_SYS_STAT_H\)[	 (].*,\1define\2 1 ,
 s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_STDLIB_H\)[	 (].*,\1define\2 1 ,

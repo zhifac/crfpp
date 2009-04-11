@@ -158,7 +158,7 @@ configure: failed program was:
 | #define PACKAGE_STRING ""
 | #define PACKAGE_BUGREPORT ""
 | #define PACKAGE "CRF++"
-| #define VERSION "0.51"
+| #define VERSION "0.52"
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
 configure:4084: result: gcc -E
@@ -175,7 +175,7 @@ configure: failed program was:
 | #define PACKAGE_STRING ""
 | #define PACKAGE_BUGREPORT ""
 | #define PACKAGE "CRF++"
-| #define VERSION "0.51"
+| #define VERSION "0.52"
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
 configure:4194: checking for grep that handles long lines and -e
@@ -322,7 +322,7 @@ configure: failed program was:
 | #define PACKAGE_STRING ""
 | #define PACKAGE_BUGREPORT ""
 | #define PACKAGE "CRF++"
-| #define VERSION "0.51"
+| #define VERSION "0.52"
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_SYS_STAT_H 1
 | #define HAVE_STDLIB_H 1
@@ -349,7 +349,7 @@ configure: failed program was:
 | #define PACKAGE_STRING ""
 | #define PACKAGE_BUGREPORT ""
 | #define PACKAGE "CRF++"
-| #define VERSION "0.51"
+| #define VERSION "0.52"
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_SYS_STAT_H 1
 | #define HAVE_STDLIB_H 1
@@ -548,83 +548,82 @@ configure:16219: result: yes
 configure:16231: checking whether make is GNU Make
 configure:16234: result: yes
 configure:16265: checking whether gcc accepts -mieee-fp
-configure:16297: gcc -o conftest -O3 -Wall -Wno-deprecated -mieee-fp   conftest.c -lpthread -lpthread -lm -lm -lm  >&5
-cc1: warning: command line option "-Wno-deprecated" is valid for C++/Java/ObjC++ but not for C
+configure:16297: gcc -o conftest -O3 -Wall -mieee-fp   conftest.c -lpthread -lpthread -lm -lm -lm  >&5
 configure:16303: $? = 0
 configure:16309: result:  ok, adding -mieee-fp to CFLAGS
 configure:16328: checking whether g++ accepts -mieee-fp
-configure:16360: g++ -o conftest -O3 -Wall -Wno-deprecated -mieee-fp   conftest.cpp -lpthread -lpthread -lm -lm -lm  >&5
+configure:16360: g++ -o conftest -O3 -Wall -mieee-fp   conftest.cpp -lpthread -lpthread -lm -lm -lm  >&5
 configure:16366: $? = 0
 configure:16372: result:  ok, adding -mieee-fp to CXXFLAGS
 configure:16652: checking if g++ supports stl <string> (required)
-configure:16679: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:16679: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 configure:16685: $? = 0
 configure:16705: result: yes
 configure:16709: checking if g++ supports stl <vector> (required)
-configure:16736: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:16736: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 configure:16742: $? = 0
 configure:16762: result: yes
 configure:16766: checking if g++ supports stl <map> (required)
-configure:16793: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:16793: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 configure:16799: $? = 0
 configure:16819: result: yes
 configure:16823: checking if g++ supports stl <set> (required)
-configure:16850: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:16850: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 configure:16856: $? = 0
 configure:16876: result: yes
 configure:16880: checking if g++ supports stl <iostream> (required)
-configure:16907: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:16907: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 configure:16913: $? = 0
 configure:16933: result: yes
 configure:16937: checking if g++ supports stl <fstream> (required)
-configure:16964: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:16964: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 configure:16970: $? = 0
 configure:16990: result: yes
 configure:16994: checking if g++ supports stl <sstream> (required)
-configure:17021: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:17021: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 configure:17027: $? = 0
 configure:17047: result: yes
 configure:17051: checking if g++ supports stl <stdexcept> (required)
-configure:17078: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:17078: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 configure:17084: $? = 0
 configure:17104: result: yes
 configure:17109: checking if g++ supports template <class T> (required)
-configure:17138: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:17138: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 configure:17144: $? = 0
 configure:17164: result: yes
 configure:17168: checking if g++ supports const_cast<> (required)
-configure:17196: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:17196: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 conftest.cpp: In function 'int main()':
 conftest.cpp:49: warning: unused variable 'c1'
 configure:17202: $? = 0
 configure:17222: result: yes
 configure:17226: checking if g++ supports static_cast<> (required)
-configure:17254: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:17254: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 conftest.cpp: In function 'int main()':
 conftest.cpp:49: warning: unused variable 'c1'
 configure:17260: $? = 0
 configure:17280: result: yes
 configure:17284: checking if g++ supports dynamic_cast<> (required)
-configure:17313: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:17313: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 conftest.cpp: In function 'int main()':
 conftest.cpp:50: warning: unused variable 'c1'
 configure:17319: $? = 0
 configure:17339: result: yes
 configure:17343: checking if g++ supports exception handler (required)
-configure:17377: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:17376: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 conftest.cpp: In function 'int main()':
 conftest.cpp:49: warning: unused variable 'i'
-configure:17383: $? = 0
-configure:17403: result: yes
-configure:17407: checking if g++ supports namespaces (required) 
-configure:17435: g++ -c -O3 -Wall -Wno-deprecated -mieee-fp  conftest.cpp >&5
+configure:17382: $? = 0
+configure:17402: result: yes
+configure:17406: checking if g++ supports namespaces (required) 
+configure:17434: g++ -c -O3 -Wall -mieee-fp  conftest.cpp >&5
 conftest.cpp: In function 'int main()':
 conftest.cpp:49: warning: unused variable 'a'
-configure:17441: $? = 0
-configure:17460: result: yes
-configure:17463: checking if g++ environment provides all required features
-configure:17474: result: yes
-configure:17610: creating ./config.status
+configure:17440: $? = 0
+configure:17459: result: yes
+configure:17462: checking if g++ environment provides all required features
+configure:17473: result: yes
+configure:17609: creating ./config.status
 
 ## ---------------------- ##
 ## Running config.status. ##
@@ -771,13 +770,13 @@ AUTOMAKE='${SHELL} /home/taku/proj/crfpp/missing --run automake-1.10'
 AWK='mawk'
 CC='gcc'
 CCDEPMODE='depmode=gcc3'
-CFLAGS='-O3 -Wall -Wno-deprecated -mieee-fp'
+CFLAGS='-O3 -Wall -mieee-fp'
 CPP='gcc -E'
 CPPFLAGS=''
 CXX='g++'
 CXXCPP='g++ -E'
 CXXDEPMODE='depmode=gcc3'
-CXXFLAGS='-O3 -Wall -Wno-deprecated -mieee-fp'
+CXXFLAGS='-O3 -Wall -mieee-fp'
 CYGPATH_W='echo'
 DEFS='-DHAVE_CONFIG_H'
 DEPDIR='.deps'
@@ -820,7 +819,7 @@ SED='/bin/sed'
 SET_MAKE=''
 SHELL='/bin/bash'
 STRIP='strip'
-VERSION='0.51'
+VERSION='0.52'
 ac_ct_CC='gcc'
 ac_ct_CXX='g++'
 ac_ct_DUMPBIN=''
@@ -881,7 +880,7 @@ target_alias=''
 #define PACKAGE_STRING ""
 #define PACKAGE_BUGREPORT ""
 #define PACKAGE "CRF++"
-#define VERSION "0.51"
+#define VERSION "0.52"
 #define HAVE_SYS_TYPES_H 1
 #define HAVE_SYS_STAT_H 1
 #define HAVE_STDLIB_H 1
