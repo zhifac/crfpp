@@ -41,7 +41,7 @@ win-dist:
 	cp -f crfpp.h @PACKAGE@-@VERSION@/sdk
 #	cp -f sdk/model @PACKAGE@-@VERSION@/sdk
 	cp -f sdk/example.cpp @PACKAGE@-@VERSION@/sdk	
-	cp -f doc/*.html doc/*.css @PACKAGE@-@VERSION@/doc
+	cp -fr doc/*.html doc/*.css doc/doxygen @PACKAGE@-@VERSION@/doc
 	cp -f README COPYING AUTHORS LGPL BSD @PACKAGE@-@VERSION@
 	cp -fr example/* @PACKAGE@-@VERSION@/example
 	find @PACKAGE@-@VERSION@ -name CVS | xargs rm -rf

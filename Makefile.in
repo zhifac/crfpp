@@ -733,7 +733,7 @@ win-dist:
 	cp -f crfpp.h @PACKAGE@-@VERSION@/sdk
 #	cp -f sdk/model @PACKAGE@-@VERSION@/sdk
 	cp -f sdk/example.cpp @PACKAGE@-@VERSION@/sdk	
-	cp -f doc/*.html doc/*.css @PACKAGE@-@VERSION@/doc
+	cp -fr doc/*.html doc/*.css doc/doxygen @PACKAGE@-@VERSION@/doc
 	cp -f README COPYING AUTHORS LGPL BSD @PACKAGE@-@VERSION@
 	cp -fr example/* @PACKAGE@-@VERSION@/example
 	find @PACKAGE@-@VERSION@ -name CVS | xargs rm -rf
@@ -770,8 +770,8 @@ script-clean:
 	(cd java; $(MAKE) clean;)
 
 export-package:
-#	./upload.pl -p crfpp -n crfpp        -r @VERSION@ -f CRF++-@VERSION@.tar.gz
-#	./upload.pl -p crfpp -n crfpp-win32  -r @VERSION@ -f CRF++-@VERSION@.zip
+	./upload.pl -p crfpp -n crfpp        -r @VERSION@ -f CRF++-@VERSION@.tar.gz
+	./upload.pl -p crfpp -n crfpp-win32  -r @VERSION@ -f CRF++-@VERSION@.zip
 	scp doc/*.html sf:public_html/crfpp/
 	scp doc/*.css sf:public_html/crfpp/
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
