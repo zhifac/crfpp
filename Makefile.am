@@ -84,7 +84,7 @@ script-clean:
 	(cd java; $(MAKE) clean;)
 
 export-package:
-#	./upload.pl -p crfpp -n crfpp        -r @VERSION@ -f CRF++-@VERSION@.tar.gz
-#	./upload.pl -p crfpp -n crfpp-win32  -r @VERSION@ -f CRF++-@VERSION@.zip
+	./upload.pl -p crfpp -n crfpp        -r @VERSION@ -f CRF++-@VERSION@.tar.gz
+	./upload.pl -p crfpp -n crfpp-win32  -r @VERSION@ -f CRF++-@VERSION@.zip
 	scp doc/*.html sf:public_html/crfpp/
 	scp doc/*.css sf:public_html/crfpp/
