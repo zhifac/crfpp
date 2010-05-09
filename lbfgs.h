@@ -20,7 +20,15 @@ class LBFGS {
   double stp, stp1;
   std::vector <double> diag_;
   std::vector <double> w_;
+  std::vector <double> v_;
+  std::vector <double> xi_;
   Mcsrch *mcsrch_;
+
+  void pseudo_gradient(int size,
+		       double *v,
+		       double *x,
+		       const double *g,
+		       double C);
 
   void lbfgs_optimize(int size,
                       int msize,
@@ -28,7 +36,7 @@ class LBFGS {
                       double f,
                       const double *g,
                       double *diag,
-                      double *w, bool orthant, double C, int *iflag);
+                      double *w, bool orthant, double C, double *v, double *xi, int *iflag);
 
  public:
   explicit LBFGS(): iflag_(0), iscn(0), nfev(0), iycn(0),
@@ -45,13 +53,25 @@ class LBFGS {
       iflag_ = 0;
       w_.resize(size * (2 * msize + 1) + 2 * msize);
       diag_.resize(size);
-    } else if (diag_.size() != size) {
+      v_.resize(size);
+      if (orthant) {
+	xi_.resize(size);
+      }
+    } else if (diag_.size() != size || v_.size() != size) {
+      std::cerr << "size of array is different" << std::endl;
+      return -1;
+    } else if (orthant && v_.size() != size) {
       std::cerr << "size of array is different" << std::endl;
       return -1;
     }
 
-    lbfgs_optimize(static_cast<int>(size),
-                   msize, x, f, g, &diag_[0], &w_[0], orthant, C, &iflag_);
+    if (orthant) {
+	    lbfgs_optimize(static_cast<int>(size),
+			   msize, x, f, g, &diag_[0], &w_[0], orthant, C, &v_[0], &xi_[0], &iflag_);
+    } else {
+	    lbfgs_optimize(static_cast<int>(size),
+			   msize, x, f, g, &diag_[0], &w_[0], orthant, C, g, &xi_[0], &iflag_);
+    }
 
     if (iflag_ < 0) {
       std::cerr << "routine stops with unexpected error" << std::endl;

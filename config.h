@@ -49,6 +49,9 @@
 /* Define to 1 if you have the <sys/mman.h> header file. */
 #define HAVE_SYS_MMAN_H 1
 
+/* Define to 1 if you have the <sys/param.h> header file. */
+#define HAVE_SYS_PARAM_H 1
+
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
 
@@ -80,6 +83,9 @@
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME ""
 
+/* Define to the home page for this package. */
+#define PACKAGE_URL ""
+
 /* Define to the version of this package. */
 #define PACKAGE_VERSION ""
 
@@ -87,7 +93,7 @@
 /* #undef STDC_HEADERS */
 
 /* Version number of package */
-#define VERSION "0.53"
+#define VERSION "0.54"
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */

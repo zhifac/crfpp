@@ -244,7 +244,7 @@ class LBFGS::Mcsrch {
               double *x,
               double f, const double *g, double *s,
               double *stp,
-              int *info, int *nfev, double *wa, bool orthant, double C) {
+              int *info, int *nfev, double *wa) {
     static const double p5 = 0.5;
     static const double p66 = 0.66;
     static const double xtrapf = 4.0;
@@ -300,32 +300,8 @@ class LBFGS::Mcsrch {
         *stp = stx;
       }
 
-      if (orthant) {
-        for (int j = 1; j <= size; ++j) {
-          double grad_neg = 0.0;
-          double grad_pos = 0.0;
-          double grad = 0.0;
-          if (wa[j] == 0.0) {
-            grad_neg = g[j] - 1.0 / C;
-            grad_pos = g[j] + 1.0 / C;
-          } else {
-            grad_pos = grad_neg = g[j] + 1.0 * sigma(wa[j]) / C;
-          }
-          if (grad_neg > 0.0) {
-            grad = grad_neg;
-          } else if (grad_pos < 0.0) {
-            grad = grad_pos;
-          } else {
-            grad = 0.0;
-          }
-          const double p = pi(s[j], -grad);
-          const double xi = wa[j] == 0.0 ? sigma(-grad) : sigma(wa[j]);
-          x[j] = pi(wa[j] + *stp * p, xi);
-        }
-      } else {
-        for (int j = 1; j <= size; ++j) {
-          x[j] = wa[j] + *stp * s[j];
-        }
+      for (int j = 1; j <= size; ++j) {
+	x[j] = wa[j] + *stp * s[j];
       }
       *info = -1;
       return;
@@ -405,6 +381,27 @@ void LBFGS::clear() {
   mcsrch_ = 0;
 }
 
+void LBFGS::pseudo_gradient(int size,
+			    double *v,
+			    double *x,
+			    const double *g,
+			    double C) {
+  for (int i = 1; i <= size; ++ i) {
+    if (x[i] == 0) {
+      if (g[i] + C < 0) {
+	v[i] = g[i] + C; 
+      } else if (g[i] - C > 0) {
+	v[i] = g[i] - C;
+      } else {
+	v[i] = 0;
+      }
+    }  else {
+      v[i] = g[i] + C * sigma(x[i]);
+    }
+  }
+}
+
+
 void LBFGS::lbfgs_optimize(int size,
                            int msize,
                            double *x,
@@ -414,6 +411,8 @@ void LBFGS::lbfgs_optimize(int size,
                            double *w,
                            bool orthant,
                            double C,
+			   double *v,
+			   double *xi,
                            int *iflag) {
   double yy = 0.0;
   double ys = 0.0;
@@ -424,6 +423,12 @@ void LBFGS::lbfgs_optimize(int size,
   --g;
   --x;
   --w;
+  --v;
+
+  if (orthant) {
+    --xi;
+    pseudo_gradient(size, v, x, g, C);
+  }
 
   if (!mcsrch_) mcsrch_ = new Mcsrch;
 
@@ -439,15 +444,20 @@ void LBFGS::lbfgs_optimize(int size,
     ispt = size + (msize << 1);
     iypt = ispt + size * msize;
     for (int i = 1; i <= size; ++i) {
-      w[ispt + i] = -g[i] * diag[i];
+      w[ispt + i] = -v[i] * diag[i];
     }
-    stp1 = 1.0 / std::sqrt(ddot_(size, &g[1], &g[1]));
+    stp1 = 1.0 / std::sqrt(ddot_(size, &v[1], &v[1]));
   }
 
   // MAIN ITERATION LOOP
   while (true) {
     ++iter;
     info = 0;
+    if (orthant) {
+      for (int i = 1; i <= size; ++i) {
+	xi[i] = (x[i] != 0 ? sigma(x[i]) : sigma(-v[i]));
+      }
+    }
     if (iter == 1) goto L165;
     if (iter > size) bound = size;
 
@@ -466,7 +476,7 @@ void LBFGS::lbfgs_optimize(int size,
     w[size + cp] = 1.0 / ys;
 
     for (int i = 1; i <= size; ++i) {
-      w[i] = -g[i];
+      w[i] = -v[i];
     }
 
     bound = min(iter - 1, msize);
@@ -498,6 +508,11 @@ void LBFGS::lbfgs_optimize(int size,
       if (cp == msize) cp = 0;
     }
 
+    if (orthant) {
+      for (int i = 1; i <= size; ++ i) {
+	w[i] = (sigma(w[i]) == sigma(-v[i]) ? w[i] : 0);
+      }
+    }
     // STORE THE NEW SEARCH DIRECTION
     for (int i = 1; i <= size; ++i) {
       w[ispt + point * size + i] = w[i];
@@ -516,9 +531,14 @@ void LBFGS::lbfgs_optimize(int size,
     }
 
  L172:
-    mcsrch_->mcsrch(size, &x[1], f, &g[1], &w[ispt + point * size + 1],
-                    &stp, &info, &nfev, &diag[1], orthant, C);
+    mcsrch_->mcsrch(size, &x[1], f, &v[1], &w[ispt + point * size + 1],
+                    &stp, &info, &nfev, &diag[1]);
     if (info == -1) {
+      if (orthant) {
+	for (int i = 1; i <= size; ++ i) {
+	  x[i] = (sigma(x[i]) == sigma(xi[i]) ? x[i] : 0);
+	}
+      }
       *iflag = 1;  // next value
       return;
     }
@@ -538,7 +558,7 @@ void LBFGS::lbfgs_optimize(int size,
     ++point;
     if (point == msize) point = 0;
 
-    double gnorm = std::sqrt(ddot_(size, &g[1], &g[1]));
+    double gnorm = std::sqrt(ddot_(size, &v[1], &v[1]));
     double xnorm = max(1.0, std::sqrt(ddot_(size, &x[1], &x[1])));
     if (gnorm / xnorm <= eps) {
       *iflag = 0;  // OK terminated
