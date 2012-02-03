@@ -5,6 +5,7 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
+#include <stdlib.h>
 #include <cmath>
 #include "node.h"
 #include "common.h"
