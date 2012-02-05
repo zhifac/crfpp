@@ -22,7 +22,9 @@ void FeatureCache::shrink(std::map<int, int> *old2new) {
     std::vector<int> newf;
     for (int *f = (*this)[i]; *f != -1; ++f) {
       std::map<int, int>::iterator it = old2new->find(*f);
-      if (it != old2new->end()) newf.push_back(it->second);
+      if (it != old2new->end()) {
+        newf.push_back(it->second);
+      }
     }
     newf.push_back(-1);
     std::copy(newf.begin(), newf.end(), (*this)[i]);

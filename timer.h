@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef CRFPP_TIMER_H__
-#define CRFPP_TIMER_H__
+#ifndef CRFPP_TIMER_H_
+#define CRFPP_TIMER_H_
 
 #include <ctime>
 #include <iostream>

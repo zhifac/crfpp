@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef CRFPP_COMMON_H__
-#define CRFPP_COMMON_H__
+#ifndef CRFPP_COMMON_H_
+#define CRFPP_COMMON_H_
 
 #include <setjmp.h>
 #include <cstdlib>
@@ -218,66 +218,44 @@ class string_buffer: public std::string {
 class die {
  public:
   die() {}
-  virtual ~die() {
+  ~die() {
     std::cerr << std::endl;
     exit(-1);
   }
   int operator&(std::ostream&) { return 0; }
 };
 
-class warn {
- public:
-  warn() {}
-  virtual ~warn() { std::cerr << std::endl; }
-  int operator&(std::ostream&) { return 0; }
-};
-
 struct whatlog {
   std::ostringstream stream_;
   std::string str_;
-  const char* str() {
+  const char *str() {
     str_ = stream_.str();
     return str_.c_str();
   }
-  jmp_buf cond_;
 };
 
 class wlog {
  public:
-  whatlog *l_;
-  explicit wlog(whatlog *l): l_(l) { l_->stream_.clear(); }
-  ~wlog() { longjmp(l_->cond_, 1); }
-  int operator&(std::ostream &) { return 0; }
+  wlog(whatlog *what) : what_(what) {
+    what_->stream_.clear();
+  }
+  bool operator&(std::ostream &) {
+    return false;
+  }
+ private:
+  whatlog *what_;
 };
-}
+}  // CRFPP
 
 #define WHAT what_.stream_
 
-#define CHECK_RETURN(condition, value)                                  \
-  if (condition) {} else                                                \
-    if (setjmp(what_.cond_) == 1) {                                     \
-      return value;                                                     \
-    } else                                                              \
-      wlog(&what_) & what_.stream_ <<                                   \
-          __FILE__ << "(" << __LINE__ << ") [" << #condition << "] "
+#define CHECK_FALSE(condition) \
+ if (condition) {} else return \
+   wlog(&what_) & what_.stream_ <<              \
+      __FILE__ << "(" << __LINE__ << ") [" << #condition << "] "
 
-#define CHECK_0(condition)      CHECK_RETURN(condition, 0)
-#define CHECK_FALSE(condition)  CHECK_RETURN(condition, false)
+#define CHECK_DIE(condition) \
+(condition) ? 0 : die() & std::cerr << __FILE__ << \
+"(" << __LINE__ << ") [" << #condition << "] "
 
-#define CHECK_CLOSE_FALSE(condition)                                    \
-  if (condition) {} else                                                \
-    if (setjmp(what_.cond_) == 1) {                                     \
-      close();                                                          \
-      return false;                                                     \
-    } else                                                              \
-      wlog(&what_) & what_.stream_ <<                                   \
-          __FILE__ << "(" << __LINE__ << ") [" << #condition << "] "
-
-#define CHECK_DIE(condition)                                            \
-  (condition) ? 0 : die() & std::cerr << __FILE__ <<                    \
-                                                     "(" << __LINE__ << ") [" << #condition << "] "
-
-#define CHECK_WARN(condition)                                           \
-  (condition) ? 0 : warn() & std::cerr << __FILE__ <<                   \
-                                                      "(" << __LINE__ << ") [" << #condition << "] "
 #endif

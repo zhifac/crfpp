@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef CRFPP_STREAM_WRAPPER_H__
-#define CRFPP_STREAM_WRAPPER_H__
+#ifndef CRFPP_STREAM_WRAPPER_H_
+#define CRFPP_STREAM_WRAPPER_H_
 
 #include <iostream>
 #include <fstream>

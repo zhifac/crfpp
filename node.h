@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef CRFPP_NODE_H__
-#define CRFPP_NODE_H__
+#ifndef CRFPP_NODE_H_
+#define CRFPP_NODE_H_
 
 #include <vector>
 #include <cmath>
@@ -42,7 +42,7 @@ struct Node {
   double               cost;
   double               bestCost;
   Node                *prev;
-  int                 *fvector;
+  const int           *fvector;
   std::vector<Path *>  lpath;
   std::vector<Path *>  rpath;
 
@@ -64,9 +64,8 @@ struct Node {
     std::vector<Path *>(rpath).swap(rpath);
   }
 
-  Node(): x(0), y(0), alpha(0.0), beta(0.0),
-          cost(0.0), bestCost(0.0), prev(0), fvector(0) {}
+  Node() : x(0), y(0), alpha(0.0), beta(0.0),
+           cost(0.0), bestCost(0.0), prev(0), fvector(0) {}
 };
 }
-
 #endif

@@ -15,9 +15,6 @@
 namespace CRFPP {
 
 class FeatureCache: public std::vector <int *> {
- private:
-  FreeList<int> feature_freelist_;
-
  public:
   void clear() {
     std::vector<int *>::clear();
@@ -29,6 +26,9 @@ class FeatureCache: public std::vector <int *> {
 
   explicit FeatureCache(): feature_freelist_(8192 * 16) {}
   virtual ~FeatureCache() {}
+
+ private:
+  FreeList<int> feature_freelist_;
 };
 }
 #endif

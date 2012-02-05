@@ -33,9 +33,11 @@ static const CRFPP::Option long_options[] = {
 
 namespace CRFPP {
 
-bool TaggerImpl::open(FeatureIndex *f) {
+bool TaggerImpl::open(FeatureIndex *feature_index,
+                      Allocator *allocator) {
   mode_ = LEARN;
-  feature_index_ = f;
+  feature_index_ = feature_index;
+  allocator_ = allocator;
   ysize_ = feature_index_->ysize();
   return true;
 }
@@ -53,11 +55,15 @@ bool TaggerImpl::open(Param *param) {
 
   std::string model = param->get<std::string>("model");
 
-  feature_index_ = new DecoderFeatureIndex();
-  CHECK_CLOSE_FALSE(feature_index_->open(model.c_str(), 0))
-      << feature_index_->what();
+  DecoderFeatureIndex *decoder_feature_index = new DecoderFeatureIndex;
+  allocator_ = new Allocator;
+  if (!decoder_feature_index->open(model.c_str())) {
+    close();
+    WHAT << feature_index_->what();
+    return false;
+  }
 
-  double c = param->get<double>("cost-factor");
+  const double c = param->get<double>("cost-factor");
 
   if (c <= 0.0) {
     WHAT << "cost factor must be positive";
@@ -65,6 +71,7 @@ bool TaggerImpl::open(Param *param) {
     return false;
   }
 
+  feature_index_ = decoder_feature_index;
   feature_index_->set_cost_factor(c);
   ysize_ = feature_index_->ysize();
 
@@ -87,12 +94,14 @@ bool TaggerImpl::open(const char *arg) {
 void TaggerImpl::close() {
   if (mode_ == TEST) {
     delete feature_index_;
+    delete allocator_;
     feature_index_ = 0;
+    allocator_ = 0;
   }
 }
 
 bool TaggerImpl::add2(size_t size, const char **column, bool copy) {
-  size_t xsize = feature_index_->xsize();
+  const size_t xsize = feature_index_->xsize();
 
   if ((mode_ == LEARN && size < xsize + 1) ||
       (mode_ == TEST  && size < xsize)) {
@@ -108,19 +117,23 @@ bool TaggerImpl::add2(size_t size, const char **column, bool copy) {
   s = x_.size() - 1;
 
   if (copy) {
-    for (size_t k = 0; k < size; ++k)
-      x_[s].push_back(feature_index_->strdup(column[k]));
+    for (size_t k = 0; k < size; ++k) {
+      x_[s].push_back(allocator_->strdup(column[k]));
+    }
   } else {
-    for (size_t k = 0; k < size; ++k)
+    for (size_t k = 0; k < size; ++k) {
       x_[s].push_back(column[k]);
+    }
   }
 
   result_[s] = answer_[s] = 0;  // dummy
   if (mode_ == LEARN) {
     size_t r = ysize_;
-    for (size_t k = 0; k < ysize_; ++k)
-      if (std::strcmp(yname(k), column[xsize]) == 0)
+    for (size_t k = 0; k < ysize_; ++k) {
+      if (std::strcmp(yname(k), column[xsize]) == 0){
         r = k;
+      }
+    }
 
     CHECK_FALSE(r != ysize_) << "cannot find answer: " << column[xsize];
     answer_[s] = r;
@@ -137,9 +150,11 @@ bool TaggerImpl::add(size_t size, const char **column) {
 
 bool TaggerImpl::add(const char* line) {
   const char* column[8192];
-  char *p = feature_index_->strdup(line);
-  size_t size = tokenize2(p, "\t ", column, sizeof(column));
-  if (!add2(size, column, false)) return false;
+  char *p = allocator_->strdup(line);
+  const size_t size = tokenize2(p, "\t ", column, sizeof(column));
+  if (!add2(size, column, false)) {
+    return false;
+  }
   return true;
 }
 
@@ -152,8 +167,12 @@ bool TaggerImpl::read(std::istream *is) {
       is->clear(std::ios::eofbit|std::ios::badbit);
       return true;
     }
-    if (line[0] == '\0' || line[0] == ' ' || line[0] == '\t') break;
-    if (!add(line)) return false;
+    if (line[0] == '\0' || line[0] == ' ' || line[0] == '\t') {
+      break;
+    }
+    if (!add(line)) {
+      return false;
+    }
   }
 
   return true;
@@ -178,9 +197,11 @@ bool TaggerImpl::initNbest() {
   }
 
   nbest_freelist_->free();
-  while (!agenda_->empty()) agenda_->pop();   // make empty
+  while (!agenda_->empty()) {
+    agenda_->pop();   // make empty
+  }
 
-  size_t k = x_.size()-1;
+  const size_t k = x_.size()-1;
   for (size_t i = 0; i < ysize_; ++i) {
     QueueElement *eos = nbest_freelist_->alloc();
     eos->node = node_[k][i];
@@ -200,8 +221,9 @@ bool TaggerImpl::next() {
     Node *rnode = top->node;
 
     if (rnode->x == 0) {
-      for (QueueElement *n = top; n; n = n->next)
+      for (QueueElement *n = top; n; n = n->next) {
         result_[n->node->x] = n->node->y;
+      }
       cost_ = top->gx;
       return true;
     }
@@ -223,13 +245,18 @@ bool TaggerImpl::next() {
 
 int TaggerImpl::eval() {
   int err = 0;
-  for (size_t i = 0; i < x_.size(); ++i)
-    if (answer_[i] != result_[i]) { ++err; }
+  for (size_t i = 0; i < x_.size(); ++i) {
+    if (answer_[i] != result_[i]) {
+      ++err;
+    }
+  }
   return err;
 }
 
 bool TaggerImpl::clear() {
-  if (mode_ == TEST) feature_index_->clear();
+  if (mode_ == TEST) {
+    allocator_->clear();
+  }
   x_.clear();
   node_.clear();
   answer_.clear();
@@ -239,7 +266,9 @@ bool TaggerImpl::clear() {
 }
 
 void TaggerImpl::buildLattice() {
-  if (x_.empty()) return;
+  if (x_.empty()) {
+    return;
+  }
 
   feature_index_->rebuildFeatures(this);
 
@@ -247,26 +276,34 @@ void TaggerImpl::buildLattice() {
     for (size_t j = 0; j < ysize_; ++j) {
       feature_index_->calcCost(node_[i][j]);
       const std::vector<Path *> &lpath = node_[i][j]->lpath;
-      for (const_Path_iterator it = lpath.begin(); it != lpath.end(); ++it)
+      for (const_Path_iterator it = lpath.begin(); it != lpath.end(); ++it) {
         feature_index_->calcCost(*it);
+      }
     }
   }
 }
 
 void TaggerImpl::forwardbackward() {
-  if (x_.empty()) return;
+  if (x_.empty()) {
+    return;
+  }
 
-  for (int i = 0; i < static_cast<int>(x_.size()); ++i)
-    for (size_t j = 0; j < ysize_; ++j)
+  for (int i = 0; i < static_cast<int>(x_.size()); ++i) {
+    for (size_t j = 0; j < ysize_; ++j) {
       node_[i][j]->calcAlpha();
+    }
+  }
 
-  for (int i = static_cast<int>(x_.size() - 1); i >= 0;  --i)
-    for (size_t j = 0; j < ysize_; ++j)
+  for (int i = static_cast<int>(x_.size() - 1); i >= 0;  --i) {
+    for (size_t j = 0; j < ysize_; ++j) {
       node_[i][j]->calcBeta();
+    }
+  }
 
   Z_ = 0.0;
-  for (size_t j = 0; j < ysize_; ++j)
+  for (size_t j = 0; j < ysize_; ++j) {
     Z_ = logsumexp(Z_, node_[0][j]->beta, j == 0);
+  }
 
   return;
 }
@@ -300,8 +337,9 @@ void TaggerImpl::viterbi() {
     }
   }
 
-  for (Node *n = best; n; n = n->prev)
+  for (Node *n = best; n; n = n->prev) {
     result_[n->x] = n->y;
+  }
 
   cost_ = -node_[x_.size()-1][result_[x_.size()-1]]->bestCost;
 }
@@ -313,19 +351,23 @@ double TaggerImpl::gradient(double *expected) {
   forwardbackward();
   double s = 0.0;
 
-  for (size_t i = 0;   i < x_.size(); ++i)
-    for (size_t j = 0; j < ysize_; ++j)
+  for (size_t i = 0;   i < x_.size(); ++i) {
+    for (size_t j = 0; j < ysize_; ++j) {
       node_[i][j]->calcExpectation(expected, Z_, ysize_);
+    }
+  }
 
   for (size_t i = 0;   i < x_.size(); ++i) {
-    for (int *f = node_[i][answer_[i]]->fvector; *f != -1; ++f)
+    for (const int *f = node_[i][answer_[i]]->fvector; *f != -1; ++f){
       --expected[*f + answer_[i]];
+    }
     s += node_[i][answer_[i]]->cost;  // UNIGRAM cost
     const std::vector<Path *> &lpath = node_[i][answer_[i]]->lpath;
     for (const_Path_iterator it = lpath.begin(); it != lpath.end(); ++it) {
       if ((*it)->lnode->y == answer_[(*it)->lnode->x]) {
-        for (int *f = (*it)->fvector; *f != -1; ++f)
+        for (const int *f = (*it)->fvector; *f != -1; ++f) {
           --expected[*f +(*it)->lnode->y * ysize_ +(*it)->rnode->y];
+        }
         s += (*it)->cost;  // BIGRAM COST
         break;
       }
@@ -338,7 +380,9 @@ double TaggerImpl::gradient(double *expected) {
 }
 
 double TaggerImpl::collins(double *collins) {
-  if (x_.empty()) return 0.0;
+  if (x_.empty()) {
+    return 0.0;
+  }
 
   buildLattice();
   viterbi();  // call for finding argmax y*
@@ -347,8 +391,11 @@ double TaggerImpl::collins(double *collins) {
   // if correct parse, do not run forward + backward
   {
     size_t num = 0;
-    for (size_t i = 0; i < x_.size(); ++i)
-      if (answer_[i] == result_[i]) ++num;
+    for (size_t i = 0; i < x_.size(); ++i) {
+      if (answer_[i] == result_[i]) {
+        ++num;
+      }
+    }
 
     if (num == x_.size()) return 0.0;
   }
@@ -357,14 +404,16 @@ double TaggerImpl::collins(double *collins) {
     // answer
     {
       s += node_[i][answer_[i]]->cost;
-      for (int *f = node_[i][answer_[i]]->fvector; *f != -1; ++f)
+      for (const int *f = node_[i][answer_[i]]->fvector; *f != -1; ++f) {
         ++collins[*f + answer_[i]];
+      }
 
       const std::vector<Path *> &lpath = node_[i][answer_[i]]->lpath;
       for (const_Path_iterator it = lpath.begin(); it != lpath.end(); ++it) {
         if ((*it)->lnode->y == answer_[(*it)->lnode->x]) {
-          for (int *f = (*it)->fvector; *f != -1; ++f)
+          for (const int *f = (*it)->fvector; *f != -1; ++f) {
             ++collins[*f +(*it)->lnode->y * ysize_ +(*it)->rnode->y];
+          }
           s += (*it)->cost;
           break;
         }
@@ -374,14 +423,16 @@ double TaggerImpl::collins(double *collins) {
     // result
     {
       s -= node_[i][result_[i]]->cost;
-      for (int *f = node_[i][result_[i]]->fvector; *f != -1; ++f)
+      for (const int *f = node_[i][result_[i]]->fvector; *f != -1; ++f) {
         --collins[*f + result_[i]];
+      }
 
       const std::vector<Path *> &lpath = node_[i][result_[i]]->lpath;
       for (const_Path_iterator it = lpath.begin(); it != lpath.end(); ++it) {
         if ((*it)->lnode->y == result_[(*it)->lnode->x]) {
-          for (int *f = (*it)->fvector; *f != -1; ++f)
+          for (const int *f = (*it)->fvector; *f != -1; ++f) {
             --collins[*f +(*it)->lnode->y * ysize_ +(*it)->rnode->y];
+          }
           s -= (*it)->cost;
           break;
         }
@@ -396,11 +447,17 @@ bool TaggerImpl::parse() {
   CHECK_FALSE(feature_index_->buildFeatures(this))
       << feature_index_->what();
 
-  if (x_.empty()) return true;
+  if (x_.empty()) {
+    return true;
+  }
   buildLattice();
-  if (nbest_ || vlevel_ >= 1) forwardbackward();
+  if (nbest_ || vlevel_ >= 1) {
+    forwardbackward();
+  }
   viterbi();
-  if (nbest_) initNbest();
+  if (nbest_) {
+    initNbest();
+  }
 
   return true;
 }
@@ -411,7 +468,9 @@ const char* TaggerImpl::parse(const char* input) {
 
 const char* TaggerImpl::parse(const char* input, size_t length) {
   std::istringstream is(std::string(input, length));
-  if (!read(&is) || !parse()) return 0;
+  if (!read(&is) || !parse()) {
+    return 0;
+  }
   toString();
   return os_.c_str();
 }
@@ -419,7 +478,9 @@ const char* TaggerImpl::parse(const char* input, size_t length) {
 const char* TaggerImpl::parse(const char*input, size_t len1,
                               char *output, size_t len2) {
   std::istringstream is(std::string(input, len1));
-  if (x_.empty()) return 0;
+  if (x_.empty()) {
+    return 0;
+  }
   toString();
   if ((os_.size() + 1) < len2) {
     memcpy(output, os_.data(), os_.size());
@@ -432,8 +493,12 @@ const char* TaggerImpl::parse(const char*input, size_t len1,
 
 bool TaggerImpl::parse_stream(std::istream *is,
                               std::ostream *os) {
-  if (!read(is) || !parse()) return false;
-  if (x_.empty()) return true;
+  if (!read(is) || !parse()) {
+    return false;
+  }
+  if (x_.empty()) {
+    return true;
+  }
   toString();
   os->write(os_.data(), os_.size());
   return true;
@@ -442,7 +507,7 @@ bool TaggerImpl::parse_stream(std::istream *is,
 const char* TaggerImpl::toString(char *output,
                                  size_t len) {
   const char* p = toString();
-  size_t l = _min(std::strlen(p), len);
+  const size_t l = _min(std::strlen(p), len);
   std::strncpy(output, p, l);
   return output;
 }
@@ -467,12 +532,16 @@ const char* TaggerImpl::toString() {
 
   if (nbest_ >= 1) {
     for (size_t n = 0; n < nbest_; ++n) {
-      if (!next()) break;
+      if (!next()) {
+        break;
+      }
       os_ << "# " << n << " " << prob() << '\n';
       PRINT;
     }
   } else {
-    if (vlevel_ >= 1) os_ << "# " << prob() << '\n';
+    if (vlevel_ >= 1) {
+      os_ << "# " << prob() << '\n';
+    }
     PRINT;
   }
 
@@ -504,7 +573,7 @@ Tagger *createTagger(const char *argv) {
 const char *getTaggerError() {
   return errorStr.c_str();
 }
-}
+}   // namespac eCRFPP
 
 int crfpp_test(int argc, char **argv) {
   CRFPP::Param param;
@@ -528,7 +597,10 @@ int crfpp_test(int argc, char **argv) {
   }
 
   std::string output = param.get<std::string>("output");
-  if (output.empty()) output = "-";
+  if (output.empty()) {
+    output = "-";
+  }
+
   CRFPP::ostream_wrapper os(output.c_str());
   if (!*os) {
     std::cerr << "no such file or directory: " << output << std::endl;
@@ -537,7 +609,9 @@ int crfpp_test(int argc, char **argv) {
 
   const std::vector<std::string>& rest_ = param.rest_args();
   std::vector<std::string> rest = rest_;  // trivial copy
-  if (rest.empty()) rest.push_back("-");
+  if (rest.empty()) {
+    rest.push_back("-");
+  }
 
   for (size_t i = 0; i < rest.size(); ++i) {
     CRFPP::istream_wrapper is(rest[i].c_str());
@@ -545,7 +619,9 @@ int crfpp_test(int argc, char **argv) {
       std::cerr << "no such file or directory: " << rest[i] << std::endl;
       return -1;
     }
-    while (*is) tagger.parse_stream(is.get(), os.get());
+    while (*is) {
+      tagger.parse_stream(is.get(), os.get());
+    }
   }
 
   return 0;

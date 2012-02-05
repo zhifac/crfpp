@@ -15,12 +15,12 @@ namespace CRFPP {
 struct Node;
 
 struct Path {
-  Node   *rnode;
-  Node   *lnode;
-  int    *fvector;
-  double  cost;
+  Node      *rnode;
+  Node      *lnode;
+  const int *fvector;
+  double     cost;
 
-  Path(): rnode(0), lnode(0), fvector(0), cost(0.0) {}
+  Path() : rnode(0), lnode(0), fvector(0), cost(0.0) {}
 
   // for CRF
   void calcExpectation(double *expected, double, size_t) const;

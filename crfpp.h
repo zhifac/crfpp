@@ -5,8 +5,8 @@
 
   Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 */
-#ifndef CRFPP_CRFPP_H__
-#define CRFPP_CRFPP_H__
+#ifndef CRFPP_CRFPP_H_
+#define CRFPP_CRFPP_H_
 
 /* C interface  */
 #ifdef __cplusplus
@@ -100,6 +100,27 @@ extern "C" {
 #ifdef __cplusplus
 
 namespace CRFPP {
+
+class Tagger;
+
+class Model {
+ public:
+#ifndef SWIG
+  // open model with parameters in argv[]
+  // e.g, argv[] = {"CRF++", "-m", "model", "-v3"};
+  virtual bool open(int argc,  char** argv) = 0;
+
+  // open model with parameter arg, e.g. arg = "-m model -v3";
+  virtual bool open(const char* arg) = 0;
+
+  // close the current model
+  virtual bool close() = 0;
+#endif
+
+  // create Tagger object. Returned object shared the same
+  // model object
+  virtual Tagger *createTagger() const;
+};
 
 class Tagger {
  public:
@@ -278,15 +299,27 @@ class Tagger {
 
 // create CRFPP::Tagger instance with parameters in argv[]
 // e.g, argv[] = {"CRF++", "-m", "model", "-v3"};
-
 CRFPP_DLL_EXTERN Tagger *createTagger(int argc, char **argv);
 
 // create CRFPP::Tagger instance with parameter in arg
 // e.g. arg = "-m model -v3";
 CRFPP_DLL_EXTERN Tagger *createTagger(const char *arg);
 
+// create CRFPP::Model instance with parameters in argv[]
+// e.g, argv[] = {"CRF++", "-m", "model", "-v3"};
+CRFPP_DLL_EXTERN Model *createModel(int argc, char **argv);
+
+// create CRFPP::Model instance with parameter in arg
+// e.g. arg = "-m model -v3";
+CRFPP_DLL_EXTERN Model *createModel(const char *arg);
+
 // return error code of createTagger();
-CRFPP_DLL_EXTERN const char* getTaggerError();
+CRFPP_DLL_EXTERN const char *getTaggerError();
+
+// alias of getTaggerError();
+CRFPP_DLL_EXTERN const char *getLastError();
+
+
 }
 
 #endif

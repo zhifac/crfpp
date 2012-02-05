@@ -5,8 +5,8 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
-#ifndef CRFPP_TAGGER_H__
-#define CRFPP_TAGGER_H__
+#ifndef CRFPP_TAGGER_H_
+#define CRFPP_TAGGER_H_
 
 #include <iostream>
 #include <vector>
@@ -21,6 +21,8 @@ namespace CRFPP {
 static inline double toprob(Node *n, double Z) {
   return std::exp(n->alpha + n->beta - n->cost - Z);
 }
+
+class Allocator;
 
 class TaggerImpl : public Tagger {
  private:
@@ -39,20 +41,21 @@ class TaggerImpl : public Tagger {
   };
 
   enum { TEST, LEARN };
-  unsigned int mode_   : 2;
-  unsigned int vlevel_ : 3;
-  unsigned int nbest_  : 11;
-  size_t                            ysize_;
-  double                            cost_;
-  double                            Z_;
-  size_t                            feature_id_;
-  unsigned short                    thread_id_;
-  FeatureIndex                     *feature_index_;
+  unsigned int    mode_ ;
+  unsigned int    vlevel_;
+  unsigned int    nbest_;
+  size_t          ysize_;
+  double          cost_;
+  double          Z_;
+  size_t          feature_id_;
+  unsigned short  thread_id_;
+  FeatureIndex   *feature_index_;
+  Allocator      *allocator_;
   std::vector<std::vector <const char *> > x_;
   std::vector<std::vector <Node *> > node_;
   std::vector<unsigned short int>  answer_;
   std::vector<unsigned short int>  result_;
-  whatlog what_;
+  whatlog       what_;
   string_buffer os_;
 
   scoped_ptr<std::priority_queue <QueueElement*, std::vector <QueueElement *>,
@@ -71,6 +74,10 @@ class TaggerImpl : public Tagger {
                          thread_id_(0), feature_index_(0) {}
   virtual ~TaggerImpl() { close(); }
 
+  Allocator *allocator() const {
+    return allocator_;
+  }
+
   void   set_feature_id(size_t id) { feature_id_  = id; }
   size_t feature_id() const { return feature_id_; }
   void   set_thread_id(unsigned short id) { thread_id_ = id; }
@@ -84,8 +91,8 @@ class TaggerImpl : public Tagger {
   bool         shrink();
   bool         parse_stream(std::istream *, std::ostream *);
   bool         read(std::istream *);
+  bool         open(FeatureIndex *, Allocator *);  // for LEARN mode
   bool         open(Param *);
-  bool         open(FeatureIndex *);
   bool         open(const char*);
   bool         open(int, char **);
   void         close();
@@ -158,8 +165,9 @@ class TaggerImpl : public Tagger {
   }
 
   void set_cost_factor(float cost_factor) {
-    if (cost_factor > 0)
+    if (cost_factor > 0) {
       feature_index_->set_cost_factor(cost_factor);
+    }
   }
 
   void set_nbest(size_t nbest) {
@@ -169,5 +177,4 @@ class TaggerImpl : public Tagger {
   const char* what() { return what_.str(); }
 };
 }
-
 #endif

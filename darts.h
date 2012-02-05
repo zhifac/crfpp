@@ -1,10 +1,9 @@
-//
-//  Darts -- Double-ARray Trie System
-//
-//  $Id: darts.h 1577 2007-01-30 17:01:10Z taku $;
-//
-//  Copyright(C) 2001-2007 Taku Kudo <taku@chasen.org>
-//
+/*
+  Darts -- Double-ARray Trie System
+
+
+  Copyright(C) 2001-2007 Taku Kudo <taku@chasen.org>
+*/
 #ifndef DARTS_H_
 #define DARTS_H_
 
@@ -22,6 +21,7 @@ namespace zlib {
 #endif
 
 namespace CRFPP {
+
 namespace Darts {
 
 template <class T> inline T _max(T x, T y) { return(x > y) ? x : y; }
@@ -221,11 +221,11 @@ class DoubleArrayImpl {
                               no_delete_(0), error_(0) {}
   ~DoubleArrayImpl() { clear(); }
 
-  void set_result(value_type& x, value_type r, size_t) {
+  void set_result(value_type& x, value_type r, size_t) const {
     x = r;
   }
 
-  void set_result(result_pair_type& x, value_type r, size_t l) {
+  void set_result(result_pair_type& x, value_type r, size_t l) const {
     x.value = r;
     x.length = l;
   }
@@ -390,15 +390,15 @@ class DoubleArrayImpl {
   inline void exactMatchSearch(const key_type *key,
                                T & result,
                                size_t len = 0,
-                               size_t node_pos = 0) {
-    result = exactMatchSearch<T> (key, len, node_pos);
+                               size_t node_pos = 0) const {
+    result = exactMatchSearch<T>(key, len, node_pos);
     return;
   }
 
   template <class T>
   inline T exactMatchSearch(const key_type *key,
                             size_t len = 0,
-                            size_t node_pos = 0) {
+                            size_t node_pos = 0) const {
     if (!len) len = length_func_()(key);
 
     T result;
@@ -428,7 +428,7 @@ class DoubleArrayImpl {
                             T* result,
                             size_t result_len,
                             size_t len = 0,
-                            size_t node_pos = 0) {
+                            size_t node_pos = 0) const {
     if (!len) len = length_func_()(key);
 
     register array_type_  b   = array_[node_pos].base;
@@ -466,7 +466,7 @@ class DoubleArrayImpl {
   value_type traverse(const key_type *key,
                       size_t &node_pos,
                       size_t &key_pos,
-                      size_t len = 0) {
+                      size_t len = 0) const {
     if (!len) len = length_func_()(key);
 
     register array_type_  b = array_[node_pos].base;

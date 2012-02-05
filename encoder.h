@@ -12,9 +12,6 @@
 
 namespace CRFPP {
 class Encoder {
- private:
-  whatlog what_;
-
  public:
   enum { CRF_L2, CRF_L1, MIRA };
   bool learn(const char *, const char *,
@@ -28,6 +25,9 @@ class Encoder {
                const char* binary_file);
 
   const char* what() { return what_.str(); }
+
+ private:
+  whatlog what_;
 };
 }
 #endif
