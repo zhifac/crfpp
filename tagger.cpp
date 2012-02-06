@@ -33,11 +33,60 @@ static const CRFPP::Option long_options[] = {
 
 namespace CRFPP {
 
+Tagger *ModelImpl::createTagger() const {
+  if (!feature_index_.get()) {
+    return 0;
+  }
+  TaggerImpl *tagger = new TaggerImpl;
+  tagger->open(feature_index_.get(), nbest_, vlevel_);
+  return tagger;
+}
+
+bool ModelImpl::open(Param *param) {
+  nbest_ = param->get<int>("nbest");
+  vlevel_ = param->get<int>("verbose");
+  const std::string model = param->get<std::string>("model");
+  feature_index_.reset(new DecoderFeatureIndex);
+  if (!feature_index_->open(model.c_str())) {
+    WHAT << feature_index_->what();
+    feature_index_.reset(0);
+    return false;
+  }
+  const double c = param->get<double>("cost-factor");
+  feature_index_->set_cost_factor(c);
+  return true;
+}
+
+bool ModelImpl::open(int argc,  char** argv) {
+  Param param;
+  CHECK_FALSE(param.open(argc, argv, long_options))
+      << param.what();
+  return open(&param);
+}
+
+bool ModelImpl::open(const char* arg) {
+  Param param;
+  CHECK_FALSE(param.open(arg, long_options)) << param.what();
+  return open(&param);
+}
+
 bool TaggerImpl::open(FeatureIndex *feature_index,
                       Allocator *allocator) {
   mode_ = LEARN;
   feature_index_ = feature_index;
   allocator_ = allocator;
+  ysize_ = feature_index_->ysize();
+  return true;
+}
+
+bool TaggerImpl::open(FeatureIndex *feature_index,
+                      unsigned nbest,
+                      unsigned vlevel) {
+  close();
+  feature_index_ = feature_index;
+  nbest_ = nbest;
+  vlevel_ = vlevel;
+  allocator_ = new Allocator;
   ysize_ = feature_index_->ysize();
   return true;
 }
@@ -56,10 +105,12 @@ bool TaggerImpl::open(Param *param) {
   std::string model = param->get<std::string>("model");
 
   DecoderFeatureIndex *decoder_feature_index = new DecoderFeatureIndex;
+  feature_index_ = decoder_feature_index;
   allocator_ = new Allocator;
+
   if (!decoder_feature_index->open(model.c_str())) {
-    close();
     WHAT << feature_index_->what();
+    close();
     return false;
   }
 
@@ -71,7 +122,6 @@ bool TaggerImpl::open(Param *param) {
     return false;
   }
 
-  feature_index_ = decoder_feature_index;
   feature_index_->set_cost_factor(c);
   ysize_ = feature_index_->ysize();
 

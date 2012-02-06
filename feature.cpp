@@ -15,9 +15,9 @@ namespace CRFPP {
 static const char *BOS[4] = { "_B-1", "_B-2", "_B-3", "_B-4"};
 static const char *EOS[4] = { "_B+1", "_B+2", "_B+3", "_B+4"};
 
-const char *FeatureIndex::get_index(const char *&p,
-                                    size_t pos,
-                                    const TaggerImpl &tagger) const {
+const char *FeatureIndex::getIndex(const char *&p,
+                                   size_t pos,
+                                   const TaggerImpl &tagger) const {
   if (*p++ !='[') {
     return 0;
   }
@@ -80,10 +80,10 @@ NEXT2:
   return tagger.x(idx, col);
 }
 
-bool FeatureIndex::apply_rule(string_buffer *os,
-                              const char *p,
-                              size_t pos,
-                              const TaggerImpl& tagger) const {
+bool FeatureIndex::applyRule(string_buffer *os,
+                             const char *p,
+                             size_t pos,
+                             const TaggerImpl& tagger) const {
   os->assign("");  // clear
   const char *r;
 
@@ -96,7 +96,7 @@ bool FeatureIndex::apply_rule(string_buffer *os,
         switch (*++p) {
           case 'x':
             ++p;
-            r = get_index(p, pos, tagger);
+            r = getIndex(p, pos, tagger);
             if (!r) {
               return false;
             }
@@ -120,7 +120,6 @@ void FeatureIndex::rebuildFeatures(TaggerImpl *tagger) const {
 
   Allocator *allocator = tagger->allocator();
   FeatureCache *feature_cache = allocator->feature_cache();
-  allocator->clear();
 
   for (size_t cur = 0; cur < tagger->size(); ++cur) {
     const int *f = (*feature_cache)[fid++];
@@ -148,7 +147,7 @@ void FeatureIndex::rebuildFeatures(TaggerImpl *tagger) const {
   }
 }
 
-#define ADD { const int id = this->getID(os.c_str());         \
+#define ADD { const int id = getID(os.c_str());         \
     if (id != -1) feature.push_back(id); } while (0)
 
 bool FeatureIndex::buildFeatures(TaggerImpl *tagger) const {
@@ -162,7 +161,7 @@ bool FeatureIndex::buildFeatures(TaggerImpl *tagger) const {
     for (std::vector<std::string>::const_iterator it
              = unigram_templs_.begin();
          it != unigram_templs_.end(); ++it) {
-      if (!apply_rule(&os, it->c_str(), cur, *tagger)) {
+      if (!applyRule(&os, it->c_str(), cur, *tagger)) {
         return false;
       }
       ADD;
@@ -175,7 +174,7 @@ bool FeatureIndex::buildFeatures(TaggerImpl *tagger) const {
     for (std::vector<std::string>::const_iterator
              it = bigram_templs_.begin();
          it != bigram_templs_.end(); ++it) {
-      if (!apply_rule(&os, it->c_str(), cur, *tagger)) {
+      if (!applyRule(&os, it->c_str(), cur, *tagger)) {
         return false;
       }
       ADD;

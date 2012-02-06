@@ -29,9 +29,59 @@ template <class T> static inline void read_static(const char **ptr,
 
 char *Allocator::strdup(const char *p) {
   const size_t len = std::strlen(p);
-  char *q = char_freelist_.alloc(len + 1);
+  char *q = char_freelist_->alloc(len + 1);
   std::strcpy(q, p);
   return q;
+}
+
+Allocator::Allocator(size_t thread_num)
+    : thread_num_(thread_num),
+      feature_cache_(new FeatureCache),
+      char_freelist_(new FreeList<char>(8192)) {
+  init();
+}
+
+Allocator::Allocator()
+    : thread_num_(1),
+      feature_cache_(new FeatureCache),
+      char_freelist_(new FreeList<char>(8192)) {
+  init();
+}
+
+Allocator::~Allocator() {}
+
+Path *Allocator::newPath(size_t thread_id) {
+  return path_freelist_[thread_id].alloc();
+}
+
+Node *Allocator::newNode(size_t thread_id) {
+  return node_freelist_[thread_id].alloc();
+}
+
+void Allocator::clear() {
+  feature_cache_->clear();
+  char_freelist_->free();
+  for (size_t i = 0; i < thread_num_; ++i) {
+    path_freelist_[i].free();
+    node_freelist_[i].free();
+  }
+}
+
+FeatureCache *Allocator::feature_cache() const {
+  return feature_cache_.get();
+}
+
+size_t Allocator::thread_num() const {
+  return thread_num_;
+}
+
+void Allocator::init() {
+  path_freelist_.reset(new FreeList<Path> [thread_num_]);
+  node_freelist_.reset(new FreeList<Node> [thread_num_]);
+  for (size_t i = 0; i < thread_num_; ++i) {
+    path_freelist_[i].set_size(8192 * 16);
+    node_freelist_[i].set_size(8192);
+  }
 }
 
 int DecoderFeatureIndex::getID(const char *key) const {
@@ -424,7 +474,7 @@ bool EncoderFeatureIndex::save(const char *filename,
 void FeatureIndex::calcCost(Node *n) const {
   n->cost = 0.0;
 
-#define ADD_COST(T, A)                                                        \
+#define ADD_COST(T, A)                                                  \
   do { T c = 0;                                                               \
     for (const int *f = n->fvector; *f != -1; ++f) { c += (A)[*f + n->y];  }  \
     n->cost =cost_factor_ *(T)c; } while (0)

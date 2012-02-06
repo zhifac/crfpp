@@ -112,14 +112,15 @@ class Model {
 
   // open model with parameter arg, e.g. arg = "-m model -v3";
   virtual bool open(const char* arg) = 0;
-
-  // close the current model
-  virtual bool close() = 0;
 #endif
 
   // create Tagger object. Returned object shared the same
   // model object
-  virtual Tagger *createTagger() const;
+  virtual Tagger *createTagger() const = 0;
+
+  virtual const char* what() = 0;
+
+  virtual ~Model() {}
 };
 
 class Tagger {
@@ -307,11 +308,11 @@ CRFPP_DLL_EXTERN Tagger *createTagger(const char *arg);
 
 // create CRFPP::Model instance with parameters in argv[]
 // e.g, argv[] = {"CRF++", "-m", "model", "-v3"};
-CRFPP_DLL_EXTERN Model *createModel(int argc, char **argv);
+// CRFPP_DLL_EXTERN Model *createModel(int argc, char **argv);
 
 // create CRFPP::Model instance with parameter in arg
 // e.g. arg = "-m model -v3";
-CRFPP_DLL_EXTERN Model *createModel(const char *arg);
+// CRFPP_DLL_EXTERN Model *createModel(const char *arg);
 
 // return error code of createTagger();
 CRFPP_DLL_EXTERN const char *getTaggerError();

@@ -24,54 +24,30 @@ static inline double toprob(Node *n, double Z) {
 
 class Allocator;
 
-class TaggerImpl : public Tagger {
- private:
-  struct QueueElement {
-    Node *node;
-    QueueElement *next;
-    double fx;
-    double gx;
-  };
-
-  class QueueElementComp {
-   public:
-    const bool operator()(QueueElement *q1,
-                          QueueElement *q2)
-    { return(q1->fx > q2->fx); }
-  };
-
-  enum { TEST, LEARN };
-  unsigned int    mode_ ;
-  unsigned int    vlevel_;
-  unsigned int    nbest_;
-  size_t          ysize_;
-  double          cost_;
-  double          Z_;
-  size_t          feature_id_;
-  unsigned short  thread_id_;
-  FeatureIndex   *feature_index_;
-  Allocator      *allocator_;
-  std::vector<std::vector <const char *> > x_;
-  std::vector<std::vector <Node *> > node_;
-  std::vector<unsigned short int>  answer_;
-  std::vector<unsigned short int>  result_;
-  whatlog       what_;
-  string_buffer os_;
-
-  scoped_ptr<std::priority_queue <QueueElement*, std::vector <QueueElement *>,
-                                  QueueElementComp> > agenda_;
-  scoped_ptr<FreeList <QueueElement> > nbest_freelist_;
-
-  void forwardbackward();
-  void viterbi();
-  void buildLattice();
-  bool initNbest();
-  bool add2(size_t, const char **, bool);
-
+class ModelImpl : public Model {
  public:
-  explicit TaggerImpl(): mode_(TEST), vlevel_(0), nbest_(0),
-                         ysize_(0), Z_(0), feature_id_(0),
-                         thread_id_(0), feature_index_(0) {}
+  ModelImpl() : nbest_(0), vlevel_(0) {}
+  virtual ~ModelImpl() {}
+  bool open(int argc,  char** argv);
+  bool open(const char* arg);
+  Tagger *createTagger() const;
+  const char* what() { return what_.str(); }
+
+ private:
+  bool open(Param *param);
+
+  whatlog       what_;
+  unsigned int nbest_;
+  unsigned int vlevel_;
+  scoped_ptr<DecoderFeatureIndex> feature_index_;
+};
+
+class TaggerImpl : public Tagger {
+ public:
+  explicit TaggerImpl() : mode_(TEST), vlevel_(0), nbest_(0),
+                          ysize_(0), Z_(0), feature_id_(0),
+                          thread_id_(0), feature_index_(0),
+                          allocator_(0) {}
   virtual ~TaggerImpl() { close(); }
 
   Allocator *allocator() const {
@@ -89,14 +65,16 @@ class TaggerImpl : public Tagger {
   double       gradient(double *);
   double       collins(double *);
   bool         shrink();
-  bool         parse_stream(std::istream *, std::ostream *);
-  bool         read(std::istream *);
-  bool         open(FeatureIndex *, Allocator *);  // for LEARN mode
-  bool         open(Param *);
-  bool         open(const char*);
-  bool         open(int, char **);
+  bool         parse_stream(std::istream *is, std::ostream *os);
+  bool         read(std::istream *is);
+  bool         open(FeatureIndex *feature_index, Allocator *allocator);  // for LEARN mode
+  bool         open(FeatureIndex *feature_index,
+                    unsigned int nvest, unsigned velvel);
+  bool         open(Param *param);
+  bool         open(const char *argv);
+  bool         open(int argc, char **argv);
   void         close();
-  bool         add(size_t, const char **);
+  bool         add(size_t size, const char **line);
   bool         add(const char*);
   size_t       size() const { return x_.size(); }
   size_t       xsize() const { return feature_index_->xsize(); }
@@ -175,6 +153,49 @@ class TaggerImpl : public Tagger {
   }
 
   const char* what() { return what_.str(); }
+
+ private:
+  void forwardbackward();
+  void viterbi();
+  void buildLattice();
+  bool initNbest();
+  bool add2(size_t, const char **, bool);
+
+  struct QueueElement {
+    Node *node;
+    QueueElement *next;
+    double fx;
+    double gx;
+  };
+
+  class QueueElementComp {
+   public:
+    const bool operator()(QueueElement *q1,
+                          QueueElement *q2)
+    { return(q1->fx > q2->fx); }
+  };
+
+  enum { TEST, LEARN };
+  unsigned int    mode_ ;
+  unsigned int    vlevel_;
+  unsigned int    nbest_;
+  size_t          ysize_;
+  double          cost_;
+  double          Z_;
+  size_t          feature_id_;
+  unsigned short  thread_id_;
+  FeatureIndex   *feature_index_;
+  Allocator      *allocator_;
+  std::vector<std::vector <const char *> > x_;
+  std::vector<std::vector <Node *> > node_;
+  std::vector<unsigned short int>  answer_;
+  std::vector<unsigned short int>  result_;
+  whatlog       what_;
+  string_buffer os_;
+
+  scoped_ptr<std::priority_queue <QueueElement*, std::vector <QueueElement *>,
+                                  QueueElementComp> > agenda_;
+  scoped_ptr<FreeList <QueueElement> > nbest_freelist_;
 };
 }
 #endif
