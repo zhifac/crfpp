@@ -13,8 +13,6 @@
 #include <string>
 #include <limits>
 
-/* COPY FROM Boost::timer */
-
 namespace CRFPP {
 
 class timer {
@@ -26,9 +24,10 @@ class timer {
   }
 
   double elapsed_max() const {
-    return(static_cast<double>(std::numeric_limits<std::clock_t>::max())
-           - static_cast<double>(start_time_)) /
-        static_cast<double>(CLOCKS_PER_SEC);
+    //    return (static_cast<double>(std::numeric_limits<std::clock_t>::max())
+    //           - static_cast<double>(start_time_)) /
+    //        static_cast<double>(CLOCKS_PER_SEC);
+    return 0.0;
   }
 
   double elapsed_min() const {

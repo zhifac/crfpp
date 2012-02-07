@@ -110,7 +110,7 @@ bool EncoderFeatureIndex::open(const char *template_filename,
 }
 
 bool EncoderFeatureIndex::openTemplate(const char *filename) {
-  std::ifstream ifs(filename);
+  std::ifstream ifs(WPATH(filename));
   CHECK_FALSE(ifs) << "open failed: "  << filename;
 
   std::string line;
@@ -131,7 +131,7 @@ bool EncoderFeatureIndex::openTemplate(const char *filename) {
 }
 
 bool EncoderFeatureIndex::openTagSet(const char *filename) {
-  std::ifstream ifs(filename);
+  std::ifstream ifs(WPATH(filename));
   CHECK_FALSE(ifs) << "no such file or directory: " << filename;
 
   char  line[8192];
@@ -253,7 +253,7 @@ void EncoderFeatureIndex::shrink(size_t freq, Allocator *allocator) {
 
 bool EncoderFeatureIndex::convert(const char *text_filename,
                                   const char *binary_filename) {
-  std::ifstream ifs(text_filename);
+  std::ifstream ifs(WPATH(text_filename));
 
   y_.clear();
   dic_.clear();
@@ -384,7 +384,7 @@ bool EncoderFeatureIndex::save(const char *filename,
       << "cannot build double-array";
 
   std::ofstream bofs;
-  bofs.open(filename, OUTPUT_MODE);
+  bofs.open(WPATH(filename), OUTPUT_MODE);
 
   CHECK_FALSE(bofs) << "open failed: " << filename;
 
@@ -421,7 +421,7 @@ bool EncoderFeatureIndex::save(const char *filename,
     std::string filename2 = filename;
     filename2 += ".txt";
 
-    std::ofstream tofs(filename2.c_str());
+    std::ofstream tofs(WPATH(filename2.c_str()));
 
     CHECK_FALSE(tofs) << " no such file or directory: " << filename2;
 

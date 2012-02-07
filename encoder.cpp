@@ -307,7 +307,7 @@ bool Encoder::learn(const char *templfile,
   {
     progress_timer pg;
 
-    std::ifstream ifs(trainfile);
+    std::ifstream ifs(WPATH(trainfile));
     CHECK_FALSE(ifs) << "cannot open: " << trainfile;
 
     std::cout << "reading training data: " << std::flush;

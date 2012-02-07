@@ -625,7 +625,31 @@ Tagger *createTagger(const char *argv) {
   return tagger;
 }
 
+Model *createModel(int argc, char **argv) {
+  ModelImpl *model = new ModelImpl();
+  if (!model->open(argc, argv)) {
+    errorStr = model->what();
+    delete model;
+    return 0;
+  }
+  return model;
+}
+
+Model *createModel(const char *argv) {
+  ModelImpl *model = new ModelImpl();
+  if (!model->open(argv)) {
+    errorStr = model->what();
+    delete model;
+    return 0;
+  }
+  return model;
+}
+
 const char *getTaggerError() {
+  return getTaggerError();
+}
+
+const char *getLastError() {
   return errorStr.c_str();
 }
 }   // namespac eCRFPP

@@ -8,7 +8,6 @@
 #ifndef CRFPP_COMMON_H_
 #define CRFPP_COMMON_H_
 
-#include <setjmp.h>
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -18,12 +17,17 @@
 #include <algorithm>
 #include <cmath>
 
+#if defined(_WIN32) && !defined(__CYGWIN__)
+#include <windows.h>
+#define NOMINMAX
+#endif
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #define COPYRIGHT  "CRF++: Yet Another CRF Tool Kit\nCopyright (C) "    \
-  "2005-2009 Taku Kudo, All rights reserved.\n"
+  "2005-2012 Taku Kudo, All rights reserved.\n"
 #define MODEL_VERSION 100
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
@@ -173,6 +177,17 @@ inline void uitoa(T val, char *s) {
 
   return;
 }
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+std::wstring Utf8ToWide(const std::string &input);
+std::string WideToUtf8(const std::wstring &input);
+#endif
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+#define WPATH(path) (CRFPP::Utf8ToWide(path).c_str())
+#else
+#define WPATH(path) (path)
+#endif
 
 #define _ITOA(_n) do {                          \
     char buf[64];                               \

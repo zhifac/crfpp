@@ -23,6 +23,7 @@ extern "C" {
 #include <windows.h>
 #  ifdef DLL_EXPORT
 #    define CRFPP_DLL_EXTERN  __declspec(dllexport)
+#    define CRFPP_DLL_CLASS_EXTERN  __declspec(dllexport)
 #  else
 #    define CRFPP_DLL_EXTERN  __declspec(dllimport)
 #  endif
@@ -30,6 +31,10 @@ extern "C" {
 
 #ifndef CRFPP_DLL_EXTERN
 #  define CRFPP_DLL_EXTERN extern
+#endif
+
+#ifndef CRFPP_DLL_CLASS_EXTERN
+#  define CRFPP_DLL_CLASS_EXTERN
 #endif
 
 #ifndef SWIG
@@ -103,7 +108,7 @@ namespace CRFPP {
 
 class Tagger;
 
-class Model {
+class CRFPP_DLL_CLASS_EXTERN Model {
  public:
 #ifndef SWIG
   // open model with parameters in argv[]
@@ -123,7 +128,7 @@ class Model {
   virtual ~Model() {}
 };
 
-class Tagger {
+class CRFPP_DLL_CLASS_EXTERN Tagger {
  public:
 #ifndef SWIG
   // open model with parameters in argv[]
@@ -308,19 +313,17 @@ CRFPP_DLL_EXTERN Tagger *createTagger(const char *arg);
 
 // create CRFPP::Model instance with parameters in argv[]
 // e.g, argv[] = {"CRF++", "-m", "model", "-v3"};
-// CRFPP_DLL_EXTERN Model *createModel(int argc, char **argv);
+CRFPP_DLL_EXTERN Model *createModel(int argc, char **argv);
 
 // create CRFPP::Model instance with parameter in arg
 // e.g. arg = "-m model -v3";
-// CRFPP_DLL_EXTERN Model *createModel(const char *arg);
+CRFPP_DLL_EXTERN Model *createModel(const char *arg);
 
 // return error code of createTagger();
 CRFPP_DLL_EXTERN const char *getTaggerError();
 
 // alias of getTaggerError();
 CRFPP_DLL_EXTERN const char *getLastError();
-
-
 }
 
 #endif

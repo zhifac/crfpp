@@ -15,8 +15,7 @@
 #endif
 
 namespace CRFPP {
-
-using namespace std;
+namespace {
 
 void init_param(std::string *help,
                 std::string *version,
@@ -55,6 +54,7 @@ void init_param(std::string *help,
   *help += '\n';
   return;
 }
+}  // namespace
 
 void Param::dump_config(std::ostream *os) const {
   for (std::map<std::string, std::string>::const_iterator it = conf_.begin();
@@ -65,7 +65,7 @@ void Param::dump_config(std::ostream *os) const {
 }
 
 bool Param::load(const char *filename) {
-  std::ifstream ifs(filename);
+  std::ifstream ifs(WPATH(filename));
 
   CHECK_FALSE(ifs) << "no such file or directory: " << filename;
 
@@ -80,8 +80,8 @@ bool Param::load(const char *filename) {
     size_t s1, s2;
     for (s1 = pos+1; s1 < line.size() && isspace(line[s1]); s1++);
     for (s2 = pos-1; static_cast<long>(s2) >= 0 && isspace(line[s2]); s2--);
-    std::string value = line.substr(s1, line.size() - s1);
-    std::string key   = line.substr(0, s2 + 1);
+    const std::string value = line.substr(s1, line.size() - s1);
+    const std::string key   = line.substr(0, s2 + 1);
     set<std::string>(key.c_str(), value, false);
   }
 
@@ -92,9 +92,9 @@ bool Param::open(int argc, char **argv, const Option *opts) {
   int ind = 0;
   int _errno = 0;
 
-#define GOTO_ERROR(n) {                         \
+#define GOTO_FATAL_ERROR(n) {                         \
     _errno = n;                                 \
-    goto ERROR; } while (0)
+    goto FATAL_ERROR; } while (0)
 
   if (argc <= 0) {
     system_name_ = "unknown";
@@ -130,18 +130,18 @@ bool Param::open(int argc, char **argv, const Option *opts) {
           }
         }
 
-        if (!hit) GOTO_ERROR(0);
+        if (!hit) GOTO_FATAL_ERROR(0);
 
         if (opts[i].arg_description) {
           if (*s == '=') {
-            if (*(s+1) == '\0') GOTO_ERROR(1);
+            if (*(s+1) == '\0') GOTO_FATAL_ERROR(1);
             set<std::string>(opts[i].name, s+1);
           } else {
-            if (argc == (ind+1)) GOTO_ERROR(1);
+            if (argc == (ind+1)) GOTO_FATAL_ERROR(1);
             set<std::string>(opts[i].name, argv[++ind]);
           }
         } else {
-          if (*s == '=') GOTO_ERROR(2);
+          if (*s == '=') GOTO_FATAL_ERROR(2);
           set<int>(opts[i].name, 1);
         }
 
@@ -156,17 +156,17 @@ bool Param::open(int argc, char **argv, const Option *opts) {
           }
         }
 
-        if (!hit) GOTO_ERROR(0);
+        if (!hit) GOTO_FATAL_ERROR(0);
 
         if (opts[i].arg_description) {
           if (argv[ind][2] != '\0') {
             set<std::string>(opts[i].name, &argv[ind][2]);
           } else {
-            if (argc == (ind+1)) GOTO_ERROR(1);
+            if (argc == (ind+1)) GOTO_FATAL_ERROR(1);
             set<std::string>(opts[i].name, argv[++ind]);
           }
         } else {
-          if (argv[ind][2] != '\0') GOTO_ERROR(2);
+          if (argv[ind][2] != '\0') GOTO_FATAL_ERROR(2);
           set<int>(opts[i].name, 1);
         }
       }
@@ -177,11 +177,11 @@ bool Param::open(int argc, char **argv, const Option *opts) {
 
   return true;
 
-ERROR:
+FATAL_ERROR:
   switch (_errno) {
     case 0: WHAT << "unrecognized option `" << argv[ind] << "`"; break;
-    case 1: WHAT << "`" << argv[ind] << "` requres an argument";  break;
-    case 2: WHAT << "`" << argv[ind] << "` dosen't allow an argument"; break;
+    case 1: WHAT << "`" << argv[ind] << "` requires an argument";  break;
+    case 2: WHAT << "`" << argv[ind] << "` doesn't allow an argument"; break;
   }
   return false;
 }
