@@ -42,6 +42,29 @@ Tagger *ModelImpl::createTagger() const {
   return tagger;
 }
 
+bool TaggerImpl::open(FeatureIndex *feature_index,
+                      Allocator *allocator) {
+  close();
+  mode_ = LEARN;
+  feature_index_ = feature_index;
+  allocator_ = allocator;
+  ysize_ = feature_index_->ysize();
+  return true;
+}
+
+bool TaggerImpl::open(FeatureIndex *feature_index,
+                      unsigned int nbest,
+                      unsigned int vlevel) {
+  close();
+  mode_ = TEST_SHARED;
+  feature_index_ = feature_index;
+  nbest_ = nbest;
+  vlevel_ = vlevel;
+  allocator_ = new Allocator;
+  ysize_ = feature_index_->ysize();
+  return true;
+}
+
 bool ModelImpl::open(Param *param) {
   nbest_ = param->get<int>("nbest");
   vlevel_ = param->get<int>("verbose");
@@ -68,27 +91,6 @@ bool ModelImpl::open(const char* arg) {
   Param param;
   CHECK_FALSE(param.open(arg, long_options)) << param.what();
   return open(&param);
-}
-
-bool TaggerImpl::open(FeatureIndex *feature_index,
-                      Allocator *allocator) {
-  mode_ = LEARN;
-  feature_index_ = feature_index;
-  allocator_ = allocator;
-  ysize_ = feature_index_->ysize();
-  return true;
-}
-
-bool TaggerImpl::open(FeatureIndex *feature_index,
-                      unsigned nbest,
-                      unsigned vlevel) {
-  close();
-  feature_index_ = feature_index;
-  nbest_ = nbest;
-  vlevel_ = vlevel;
-  allocator_ = new Allocator;
-  ysize_ = feature_index_->ysize();
-  return true;
 }
 
 bool TaggerImpl::open(Param *param) {
@@ -147,6 +149,9 @@ void TaggerImpl::close() {
     delete allocator_;
     feature_index_ = 0;
     allocator_ = 0;
+  } else if (mode_ == TEST_SHARED) {
+    delete allocator_;
+    allocator_ = 0;
   }
 }
 
@@ -154,7 +159,7 @@ bool TaggerImpl::add2(size_t size, const char **column, bool copy) {
   const size_t xsize = feature_index_->xsize();
 
   if ((mode_ == LEARN && size < xsize + 1) ||
-      (mode_ == TEST  && size < xsize)) {
+      ((mode_ == TEST || mode_ == TEST_SHARED)  && size < xsize)) {
     CHECK_FALSE(false) << "# x is small: size="
                        << size << " xsize=" << xsize;
   }
@@ -304,7 +309,7 @@ int TaggerImpl::eval() {
 }
 
 bool TaggerImpl::clear() {
-  if (mode_ == TEST) {
+  if (mode_ == TEST || mode_ == TEST_SHARED) {
     allocator_->clear();
   }
   x_.clear();

@@ -61,18 +61,25 @@ class TaggerImpl : public Tagger {
   Node  *node(size_t i, size_t j) const { return node_[i][j]; }
   void   set_node(Node *n, size_t i, size_t j) { node_[i][j] = n; }
 
+  // for LEARN mode
+  bool         open(FeatureIndex *feature_index, Allocator *allocator);
+
+  // for TEST mode, but feature_index is shared.
+  bool         open(FeatureIndex *feature_index,
+                    unsigned int nvest, unsigned velvel);
+
+  // for TEST mode
+  bool         open(Param *param);
+  bool         open(const char *argv);
+  bool         open(int argc, char **argv);
+
+
   int          eval();
   double       gradient(double *);
   double       collins(double *);
   bool         shrink();
   bool         parse_stream(std::istream *is, std::ostream *os);
   bool         read(std::istream *is);
-  bool         open(FeatureIndex *feature_index, Allocator *allocator);  // for LEARN mode
-  bool         open(FeatureIndex *feature_index,
-                    unsigned int nvest, unsigned velvel);
-  bool         open(Param *param);
-  bool         open(const char *argv);
-  bool         open(int argc, char **argv);
   void         close();
   bool         add(size_t size, const char **line);
   bool         add(const char*);
@@ -133,7 +140,7 @@ class TaggerImpl : public Tagger {
   unsigned int vlevel() const { return vlevel_; }
 
   float cost_factor() const {
-    return feature_index_->cost_factor();
+    return feature_index_ ? feature_index_->cost_factor() : 0.0;
   }
 
   size_t nbest() const { return nbest_; }
@@ -143,7 +150,7 @@ class TaggerImpl : public Tagger {
   }
 
   void set_cost_factor(float cost_factor) {
-    if (cost_factor > 0) {
+    if (cost_factor > 0 && feature_index_) {
       feature_index_->set_cost_factor(cost_factor);
     }
   }
@@ -175,7 +182,7 @@ class TaggerImpl : public Tagger {
     { return(q1->fx > q2->fx); }
   };
 
-  enum { TEST, LEARN };
+  enum { TEST, TEST_SHARED, LEARN };
   unsigned int    mode_ ;
   unsigned int    vlevel_;
   unsigned int    nbest_;
