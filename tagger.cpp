@@ -652,7 +652,7 @@ const char *getTaggerError() {
 const char *getLastError() {
   return errorStr.c_str();
 }
-}   // namespac eCRFPP
+}   // namespace CRFPP
 
 int crfpp_test(int argc, char **argv) {
   CRFPP::Param param;

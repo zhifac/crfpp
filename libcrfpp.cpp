@@ -54,286 +54,236 @@ std::string WideToUtf8(const std::wstring &input) {
 }  // CRFPP
 #endif
 
-#define LIBCRFPP_ID 113212
-
 namespace {
 std::string errorStr;
 }
 
-struct crfpp_t {
-  int allocated;
-  CRFPP::Tagger* ptr;
-};
-
-#if defined(_WIN32) && !defined(__CYGWIN__)
+#if defined(_WIN32) && !defined(__CYGWIN__) &&  defined(DLL_EXPORT)
 BOOL __stdcall DllMain(HINSTANCE hinst, DWORD dwReason, void*) {
   return TRUE;
 }
 #endif
 
-crfpp_t* crfpp_new(int argc, char **argv) {
-  crfpp_t *c = new crfpp_t;
-  CRFPP::Tagger *ptr = CRFPP::createTagger(argc, argv);
-  if (!c || !ptr) {
-    delete c;
-    delete ptr;
-    errorStr = CRFPP::getTaggerError();
+crfpp_model_t* crfpp_model_new(int argc,  char **argv) {
+  CRFPP::Model *model = CRFPP::createModel(argc, argv);
+  if (!model) {
+    errorStr = CRFPP::getLastError();
     return 0;
   }
-  c->ptr = ptr;
-  c->allocated = LIBCRFPP_ID;
-  return c;
+  return reinterpret_cast<crfpp_model_t *>(model);
+}
+
+crfpp_model_t* crfpp_model_new2(const char *arg) {
+  CRFPP::Model *model = CRFPP::createModel(arg);
+  if (!model) {
+    errorStr = CRFPP::getLastError();
+    return 0;
+  }
+  return reinterpret_cast<crfpp_model_t *>(model);
+}
+
+const char* crfpp_model_strerror(crfpp_model_t *c) {
+  return reinterpret_cast<CRFPP::Model *>(c)->what();
+}
+
+crfpp_t* crfpp_model_new_tagger(crfpp_model_t *c) {
+  return reinterpret_cast<crfpp_t *>(reinterpret_cast<CRFPP::Model *>(c)->createTagger());
+}
+
+crfpp_t* crfpp_new(int argc, char **argv) {
+  CRFPP::Tagger *tagger = CRFPP::createTagger(argc, argv);
+  if (!tagger) {
+    errorStr = CRFPP::getLastError();
+    return 0;
+  }
+  return reinterpret_cast<crfpp_t *>(tagger);
 }
 
 crfpp_t* crfpp_new2(char *arg) {
-  crfpp_t *c = new crfpp_t;
-  CRFPP::Tagger *ptr = CRFPP::createTagger(arg);
-  if (!c || !ptr) {
-    delete c;
-    delete ptr;
-    errorStr = CRFPP::getTaggerError();
+  CRFPP::Tagger *tagger = CRFPP::createTagger(arg);
+  if (!tagger) {
+    errorStr = CRFPP::getLastError();
     return 0;
   }
-  c->ptr = ptr;
-  c->allocated = LIBCRFPP_ID;
-  return c;
+  return reinterpret_cast<crfpp_t *>(tagger);
 }
 
 const char* crfpp_strerror(crfpp_t *c) {
-  if (!c || !c->allocated)
-    return const_cast<char *> (errorStr.c_str());
-  return c->ptr->what();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->what();
 }
 
 void crfpp_destroy(crfpp_t *c) {
-  if (c && c->allocated) {
-    delete c->ptr;
-    delete c;
-  }
-  c = 0;
+  CRFPP::Tagger *tagger = reinterpret_cast<CRFPP::Tagger *>(c);
+  delete tagger;
 }
 
-#define CRFPP_CHECK_FIRST_ARG(c, t)                     \
-  if (!(c) || (c)->allocated != LIBCRFPP_ID) {          \
-    errorStr = "first argment seems to be invalid";     \
-    return 0;                                           \
-  } CRFPP::Tagger *(t) = (c)->ptr;
-
-#define CRFPP_CHECK_FIRST_ARG_VOID(c, t)                \
-  if (!(c) || (c)->allocated != LIBCRFPP_ID) {          \
-    errorStr = "first argment seems to be invalid";     \
-    return;                                             \
-  } CRFPP::Tagger *(t) = (c)->ptr;
-
 bool     crfpp_add2(crfpp_t* c, size_t s, const char **line) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->add(s, line);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->add(s, line);
 }
 
 bool     crfpp_add(crfpp_t* c, const char*s) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->add(s);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->add(s);
 }
 
 size_t   crfpp_size(crfpp_t* c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->size();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->size();
 }
 
 size_t   crfpp_xsize(crfpp_t* c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->xsize();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->xsize();
 }
 
 size_t   crfpp_result(crfpp_t* c, size_t i) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->result(i);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->result(i);
 }
 
 size_t   crfpp_answer(crfpp_t* c, size_t i) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->answer(i);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->answer(i);
 }
 
 size_t   crfpp_y(crfpp_t* c, size_t i) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->y(i);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->y(i);
 }
 
 size_t   crfpp_ysize(crfpp_t* c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->ysize();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->ysize();
 }
 
 double   crfpp_prob(crfpp_t* c, size_t i, size_t j) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->prob(i, j);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->prob(i, j);
 }
 
 double   crfpp_prob2(crfpp_t* c, size_t i) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->prob(i);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->prob(i);
 }
 
 double   crfpp_prob3(crfpp_t* c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->prob();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->prob();
 }
 
 double   crfpp_alpha(crfpp_t* c, size_t i, size_t j) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->alpha(i, j);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->alpha(i, j);
 }
 
 double   crfpp_beta(crfpp_t* c, size_t i, size_t j) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->beta(i, j);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->beta(i, j);
 }
 
 double   crfpp_best_cost(crfpp_t* c, size_t i, size_t j) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->best_cost(i, j);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->best_cost(i, j);
 }
 
 double   crfpp_emisstion_cost(crfpp_t* c, size_t i, size_t j) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->emission_cost(i, j);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->emission_cost(i, j);
 }
 
 const int* crfpp_emisstion_vector(crfpp_t* c, size_t i, size_t j) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->emission_vector(i, j);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->emission_vector(i, j);
 }
 
 double   crfpp_next_transition_cost(crfpp_t* c, size_t i, size_t j, size_t k) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->next_transition_cost(i, j, k);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->next_transition_cost(i, j, k);
 }
 
 double   crfpp_prev_transition_cost(crfpp_t* c, size_t i, size_t j, size_t k) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->next_transition_cost(i, j, k);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->next_transition_cost(i, j, k);
 }
 
 const  int* crfpp_next_transition_vector(crfpp_t* c, size_t i,
                                          size_t j, size_t k) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->next_transition_vector(i, j, k);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->next_transition_vector(i, j, k);
 }
 
 const int* crfpp_prev_transition_vector(crfpp_t* c, size_t i,
                                         size_t j, size_t k) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->next_transition_vector(i, j, k);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->next_transition_vector(i, j, k);
 }
 
 size_t crfpp_dsize(crfpp_t* c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->dsize();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->dsize();
 }
 
 const float* crfpp_weight_vector(crfpp_t* c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->weight_vector();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->weight_vector();
 }
 
 double   crfpp_Z(crfpp_t* c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->Z();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->Z();
 }
 
 bool     crfpp_parse(crfpp_t* c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->parse();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->parse();
 }
 
 bool     crfpp_empty(crfpp_t* c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->empty();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->empty();
 }
 
 bool     crfpp_clear(crfpp_t* c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->clear();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->clear();
 }
 
 bool     crfpp_next(crfpp_t* c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->next();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->next();
 }
 
 const char*   crfpp_yname(crfpp_t* c, size_t i) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->yname(i);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->yname(i);
 }
 
 const char*   crfpp_y2(crfpp_t* c, size_t i) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->y2(i);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->y2(i);
 }
 
 const char*   crfpp_x(crfpp_t* c, size_t i, size_t j) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->x(i, j);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->x(i, j);
 }
 
 const char**  crfpp_x2(crfpp_t* c, size_t i) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->x(i);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->x(i);
 }
 
 const char*  crfpp_parse_tostr(crfpp_t* c, const char* str) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->parse(str);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->parse(str);
 }
 
 const char*  crfpp_parse_tostr2(crfpp_t* c, const char* str, size_t len) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->parse(str, len);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->parse(str, len);
 }
 
 const char*  crfpp_parse_tostr3(crfpp_t* c, const char* str,
                                 size_t len, char *ostr, size_t len2) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->parse(str, len, ostr, len2);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->parse(str, len, ostr, len2);
 }
 
 const char*  crfpp_tostr(crfpp_t* c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->toString();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->toString();
 }
 
 const char*  crfpp_tostr2(crfpp_t* c, char *ostr, size_t len) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->toString(ostr, len);
+  return reinterpret_cast<CRFPP::Tagger *>(c)->toString(ostr, len);
 }
 
 void crfpp_set_vlevel(crfpp_t *c, unsigned int vlevel) {
-  CRFPP_CHECK_FIRST_ARG_VOID(c, t);
-  t->set_vlevel(vlevel);
+  reinterpret_cast<CRFPP::Tagger *>(c)->set_vlevel(vlevel);
 }
 
 unsigned int crfpp_vlevel(crfpp_t *c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->vlevel();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->vlevel();
 }
 
 void crfpp_set_cost_factor(crfpp_t *c, float cost_factor) {
-  CRFPP_CHECK_FIRST_ARG_VOID(c, t);
-  t->set_cost_factor(cost_factor);
+  reinterpret_cast<CRFPP::Tagger *>(c)->set_cost_factor(cost_factor);
 }
 
 float crfpp_cost_factor(crfpp_t *c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->cost_factor();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->cost_factor();
 }
 
 void crfpp_set_nbest(crfpp_t *c, size_t nbest) {
-  CRFPP_CHECK_FIRST_ARG_VOID(c, t);
-  t->set_nbest(nbest);
+  reinterpret_cast<CRFPP::Tagger *>(c)->set_nbest(nbest);
 }
 
 size_t crfpp_nbest(crfpp_t *c) {
-  CRFPP_CHECK_FIRST_ARG(c, t);
-  return t->nbest();
+  return reinterpret_cast<CRFPP::Tagger *>(c)->nbest();
 }

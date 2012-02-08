@@ -39,8 +39,14 @@ extern "C" {
 
 #ifndef SWIG
   typedef struct crfpp_t crfpp_t;
+  typedef struct crfpp_model_t crfpp_model_t;
 
   /* C interface */
+  CRFPP_DLL_EXTERN crfpp_model_t* crfpp_model_new(int,  char**);
+  CRFPP_DLL_EXTERN crfpp_model_t* crfpp_model_new2(const char*);
+  CRFPP_DLL_EXTERN const char *   crfpp_model_strerror(crfpp_model_t *);
+  CRFPP_DLL_EXTERN crfpp_t*       crfpp_model_new_tagger(crfpp_model_t *);
+
   CRFPP_DLL_EXTERN crfpp_t* crfpp_new(int,  char**);
   CRFPP_DLL_EXTERN crfpp_t* crfpp_new2(const char*);
   CRFPP_DLL_EXTERN void     crfpp_destroy(crfpp_t*);

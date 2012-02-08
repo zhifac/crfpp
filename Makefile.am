@@ -7,7 +7,7 @@ lib_LTLIBRARIES = libcrfpp.la
 libcrfpp_la_SOURCES = crfpp.h thread.h libcrfpp.cpp lbfgs.cpp scoped_ptr.h param.cpp param.h encoder.cpp feature.cpp stream_wrapper.h \
                       feature_cache.cpp feature_index.cpp node.cpp path.cpp tagger.cpp \
 		      common.h darts.h encoder.h feature_cache.h feature_index.h \
-                      freelist.h lbfgs.h mmap.h node.h path.h tagger.h timer.h
+                      freelist.h lbfgs.h mmap.h node.h path.h tagger.h timer.h winmain.h
 include_HEADERS = crfpp.h
 
 dist-hook:
