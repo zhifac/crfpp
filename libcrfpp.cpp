@@ -161,6 +161,14 @@ double   crfpp_prob3(crfpp_t* c) {
   return reinterpret_cast<CRFPP::Tagger *>(c)->prob();
 }
 
+void     crfpp_set_penalty(crfpp_t *c, size_t i, size_t j, double penalty) {
+  return reinterpret_cast<CRFPP::Tagger *>(c)->set_penalty(i, j, penalty);
+}
+
+double   crfpp_penalty(crfpp_t *c, size_t i, size_t j) {
+  return reinterpret_cast<CRFPP::Tagger *>(c)->penalty(i, j);
+}
+
 double   crfpp_alpha(crfpp_t* c, size_t i, size_t j) {
   return reinterpret_cast<CRFPP::Tagger *>(c)->alpha(i, j);
 }

@@ -233,6 +233,20 @@ bool TaggerImpl::read(std::istream *is) {
   return true;
 }
 
+void TaggerImpl::set_penalty(size_t i, size_t j, double penalty) {
+  if (penalty_.empty()) {
+    penalty_.resize(node_.size());
+    for (size_t s = 0; s < penalty_.size(); ++s) {
+      penalty_[s].resize(ysize_);
+    }
+  }
+  penalty_[i][j] = penalty;
+}
+
+double TaggerImpl::penalty(size_t i, size_t j) const {
+  return penalty_.empty() ? 0.0 : penalty_[i][j];
+}
+
 bool TaggerImpl::shrink() {
   CHECK_FALSE(feature_index_->buildFeatures(this))
       << feature_index_->what();
@@ -333,6 +347,15 @@ void TaggerImpl::buildLattice() {
       const std::vector<Path *> &lpath = node_[i][j]->lpath;
       for (const_Path_iterator it = lpath.begin(); it != lpath.end(); ++it) {
         feature_index_->calcCost(*it);
+      }
+    }
+  }
+
+  // Add penalty for Dual decomposition.
+  if (!penalty_.empty()) {
+    for (size_t i = 0; i < x_.size(); ++i) {
+      for (size_t j = 0; j < ysize_; ++j) {
+        node_[i][j]->cost += penalty_[i][j];
       }
     }
   }

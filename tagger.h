@@ -98,6 +98,8 @@ class TaggerImpl : public Tagger {
   double       prob(size_t i) const {
     return toprob(node_[i][result_[i]], Z_);
   }
+  void set_penalty(size_t i, size_t j, double penalty);
+  double penalty(size_t i, size_t j) const;
   double alpha(size_t i, size_t j) const { return node_[i][j]->alpha; }
   double beta(size_t i, size_t j) const { return node_[i][j]->beta; }
   double emission_cost(size_t i, size_t j) const { return node_[i][j]->cost; }
@@ -195,6 +197,7 @@ class TaggerImpl : public Tagger {
   Allocator      *allocator_;
   std::vector<std::vector <const char *> > x_;
   std::vector<std::vector <Node *> > node_;
+  std::vector<std::vector<double> > penalty_;
   std::vector<unsigned short int>  answer_;
   std::vector<unsigned short int>  result_;
   whatlog       what_;

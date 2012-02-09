@@ -63,6 +63,8 @@ extern "C" {
   CRFPP_DLL_EXTERN double   crfpp_prob(crfpp_t*, size_t, size_t);
   CRFPP_DLL_EXTERN double   crfpp_prob2(crfpp_t*, size_t);
   CRFPP_DLL_EXTERN double   crfpp_prob3(crfpp_t*);
+  CRFPP_DLL_EXTERN void     crfpp_set_penalty(crfpp_t *, size_t i, size_t j, double penalty);
+  CRFPP_DLL_EXTERN double   crfpp_penalty(crfpp_t *, size_t i, size_t j);
   CRFPP_DLL_EXTERN double   crfpp_alpha(crfpp_t*, size_t, size_t);
   CRFPP_DLL_EXTERN double   crfpp_beta(crfpp_t*, size_t, size_t);
   CRFPP_DLL_EXTERN double   crfpp_emisstion_cost(crfpp_t*, size_t, size_t);
@@ -219,6 +221,14 @@ class CRFPP_DLL_CLASS_EXTERN Tagger {
 
   // return conditional probability of enter output
   virtual double prob() const = 0;
+
+  // set token-level penalty. It would be useful for implementing
+  // Dual decompositon decoding.
+  // e.g.
+  // "Dual Decomposition for Parsing with Non-Projective Head Automata"
+  // Terry Koo Alexander M. Rush Michael Collins Tommi Jaakkola David Sontag
+  virtual void set_penalty(size_t i, size_t j, double penalty);
+  virtual double penalty(size_t i, size_t j) const;
 
   // return forward log-prob of the j-th tag at i-th token
   virtual double alpha(size_t i, size_t j) const = 0;
