@@ -1,3 +1,3 @@
 namespace CRFPP {
-#define VERSION "0.54"
+#define VERSION "0.55"
 }

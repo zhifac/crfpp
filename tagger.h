@@ -34,7 +34,7 @@ class ModelImpl : public Model {
   const char* what() { return what_.str(); }
 
  private:
-  bool open(Param *param);
+  bool open(const Param &param);
 
   whatlog       what_;
   unsigned int nbest_;
@@ -69,7 +69,7 @@ class TaggerImpl : public Tagger {
                     unsigned int nvest, unsigned velvel);
 
   // for TEST mode
-  bool         open(Param *param);
+  bool         open(const Param &param);
   bool         open(const char *argv);
   bool         open(int argc, char **argv);
 

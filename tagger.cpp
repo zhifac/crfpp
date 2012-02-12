@@ -65,17 +65,17 @@ bool TaggerImpl::open(FeatureIndex *feature_index,
   return true;
 }
 
-bool ModelImpl::open(Param *param) {
-  nbest_ = param->get<int>("nbest");
-  vlevel_ = param->get<int>("verbose");
-  const std::string model = param->get<std::string>("model");
+bool ModelImpl::open(const Param &param) {
+  nbest_ = param.get<int>("nbest");
+  vlevel_ = param.get<int>("verbose");
+  const std::string model = param.get<std::string>("model");
   feature_index_.reset(new DecoderFeatureIndex);
   if (!feature_index_->open(model.c_str())) {
     WHAT << feature_index_->what();
     feature_index_.reset(0);
     return false;
   }
-  const double c = param->get<double>("cost-factor");
+  const double c = param.get<double>("cost-factor");
   feature_index_->set_cost_factor(c);
   return true;
 }
@@ -84,27 +84,27 @@ bool ModelImpl::open(int argc,  char** argv) {
   Param param;
   CHECK_FALSE(param.open(argc, argv, long_options))
       << param.what();
-  return open(&param);
+  return open(param);
 }
 
 bool ModelImpl::open(const char* arg) {
   Param param;
   CHECK_FALSE(param.open(arg, long_options)) << param.what();
-  return open(&param);
+  return open(param);
 }
 
-bool TaggerImpl::open(Param *param) {
+bool TaggerImpl::open(const Param &param) {
   close();
 
-  if (!param->help_version()) {
+  if (!param.help_version()) {
     close();
     return false;
   }
 
-  nbest_ = param->get<int>("nbest");
-  vlevel_ = param->get<int>("verbose");
+  nbest_ = param.get<int>("nbest");
+  vlevel_ = param.get<int>("verbose");
 
-  std::string model = param->get<std::string>("model");
+  std::string model = param.get<std::string>("model");
 
   DecoderFeatureIndex *decoder_feature_index = new DecoderFeatureIndex;
   feature_index_ = decoder_feature_index;
@@ -116,7 +116,7 @@ bool TaggerImpl::open(Param *param) {
     return false;
   }
 
-  const double c = param->get<double>("cost-factor");
+  const double c = param.get<double>("cost-factor");
 
   if (c <= 0.0) {
     WHAT << "cost factor must be positive";
@@ -134,13 +134,13 @@ bool TaggerImpl::open(int argc, char **argv) {
   Param param;
   CHECK_FALSE(param.open(argc, argv, long_options))
       << param.what();
-  return open(&param);
+  return open(param);
 }
 
 bool TaggerImpl::open(const char *arg) {
   Param param;
   CHECK_FALSE(param.open(arg, long_options)) << param.what();
-  return open(&param);
+  return open(param);
 }
 
 void TaggerImpl::close() {
@@ -669,7 +669,7 @@ Model *createModel(const char *argv) {
 }
 
 const char *getTaggerError() {
-  return getTaggerError();
+  return errorStr.c_str();   
 }
 
 const char *getLastError() {
@@ -693,7 +693,7 @@ int crfpp_test(int argc, char **argv) {
   }
 
   CRFPP::TaggerImpl tagger;
-  if (!tagger.open(&param)) {
+  if (!tagger.open(param)) {
     std::cerr << tagger.what() << std::endl;
     return -1;
   }

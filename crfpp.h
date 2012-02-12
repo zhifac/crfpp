@@ -227,8 +227,8 @@ class CRFPP_DLL_CLASS_EXTERN Tagger {
   // e.g.
   // "Dual Decomposition for Parsing with Non-Projective Head Automata"
   // Terry Koo Alexander M. Rush Michael Collins Tommi Jaakkola David Sontag
-  virtual void set_penalty(size_t i, size_t j, double penalty);
-  virtual double penalty(size_t i, size_t j) const;
+  virtual void set_penalty(size_t i, size_t j, double penalty) = 0;
+  virtual double penalty(size_t i, size_t j) const = 0;
 
   // return forward log-prob of the j-th tag at i-th token
   virtual double alpha(size_t i, size_t j) const = 0;
