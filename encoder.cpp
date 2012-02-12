@@ -436,7 +436,8 @@ int crfpp_learn(int argc, char **argv) {
   const double         eta            = param.get<float>("eta");
   const bool           textmodel      = param.get<bool>("textmodel");
   const unsigned short thread         = param.get<unsigned short>("thread");
-  const unsigned short shrinking_size = param.get<unsigned short>("shrinking-size");
+  const unsigned short shrinking_size
+      = param.get<unsigned short>("shrinking-size");
   std::string salgo = param.get<std::string>("algorithm");
 
   toLower(&salgo);

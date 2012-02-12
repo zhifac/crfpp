@@ -134,16 +134,17 @@ bool EncoderFeatureIndex::openTagSet(const char *filename) {
   std::ifstream ifs(WPATH(filename));
   CHECK_FALSE(ifs) << "no such file or directory: " << filename;
 
-  char  line[8192];
-  char* column[1024];
+  scoped_fixed_array<char, 8192> line;
+  scoped_fixed_array<char *, 1024> column;
   size_t max_size = 0;
   std::set<std::string> candset;
 
-  while (ifs.getline(line, sizeof(line))) {
+  while (ifs.getline(line.get(), line.size())) {
     if (line[0] == '\0' || line[0] == ' ' || line[0] == '\t') {
       continue;
     }
-    const size_t size = tokenize2(line, "\t ", column, 1024);
+    const size_t size = tokenize2(line.get(), "\t ",
+                                  column.get(), column.size());
     if (max_size == 0) {
       max_size = size;
     }
@@ -264,19 +265,19 @@ bool EncoderFeatureIndex::convert(const char *text_filename,
 
   CHECK_FALSE(ifs) << "open failed: " << text_filename;
 
-  char line[8192];
+  scoped_fixed_array<char, 8192> line;
   char *column[8];
 
   // read header
   while (true) {
-    CHECK_FALSE(ifs.getline(line, sizeof(line)))
+    CHECK_FALSE(ifs.getline(line.get(), line.size()))
         << " format error: " << text_filename;
 
-    if (std::strlen(line) == 0) {
+    if (std::strlen(line.get()) == 0) {
       break;
     }
 
-    const size_t size = tokenize(line, "\t ", column, 2);
+    const size_t size = tokenize(line.get(), "\t ", column, 2);
 
     CHECK_FALSE(size == 2) << "format error: " << text_filename;
 
@@ -294,37 +295,38 @@ bool EncoderFeatureIndex::convert(const char *text_filename,
   CHECK_FALSE(xsize_ > 0) << "xsize is not defined: " << text_filename;
 
   while (true) {
-    CHECK_FALSE(ifs.getline(line, sizeof(line)))
+    CHECK_FALSE(ifs.getline(line.get(), line.size()))
         << "format error: " << text_filename;
-    if (std::strlen(line) == 0) {
+    if (std::strlen(line.get()) == 0) {
       break;
     }
-    y_.push_back(line);
+    y_.push_back(line.get());
   }
 
   while (true) {
-    CHECK_FALSE(ifs.getline(line, sizeof(line)))
+    CHECK_FALSE(ifs.getline(line.get(), line.size()))
         << "format error: " << text_filename;
-    if (std::strlen(line) == 0) {
+    if (std::strlen(line.get()) == 0) {
       break;
     }
     if (line[0] == 'U') {
-      unigram_templs_.push_back(line);
+      unigram_templs_.push_back(line.get());
     } else if (line[0] == 'B') {
-      bigram_templs_.push_back(line);
+      bigram_templs_.push_back(line.get());
     } else {
-      CHECK_FALSE(true) << "unknown type: " << line << " " << text_filename;
+      CHECK_FALSE(true) << "unknown type: " << line.get()
+                        << " " << text_filename;
     }
   }
 
   while (true) {
-    CHECK_FALSE(ifs.getline(line, sizeof(line)))
+    CHECK_FALSE(ifs.getline(line.get(), line.size()))
         << "format error: " << text_filename;
-    if (std::strlen(line) == 0) {
+    if (std::strlen(line.get()) == 0) {
       break;
     }
 
-    const size_t size = tokenize(line, "\t ", column, 2);
+    const size_t size = tokenize(line.get(), "\t ", column, 2);
     CHECK_FALSE(size == 2) << "format error: " << text_filename;
 
     dic_.insert(std::make_pair<std::string, std::pair<int, unsigned int> >
@@ -333,8 +335,8 @@ bool EncoderFeatureIndex::convert(const char *text_filename,
   }
 
   std::vector<double> alpha;
-  while (ifs.getline(line, sizeof(line))) {
-    alpha.push_back(std::atof(line));
+  while (ifs.getline(line.get(), line.size())) {
+    alpha.push_back(std::atof(line.get()));
   }
 
   alpha_ = &alpha[0];

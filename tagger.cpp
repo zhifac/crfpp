@@ -185,7 +185,7 @@ bool TaggerImpl::add2(size_t size, const char **column, bool copy) {
   if (mode_ == LEARN) {
     size_t r = ysize_;
     for (size_t k = 0; k < ysize_; ++k) {
-      if (std::strcmp(yname(k), column[xsize]) == 0){
+      if (std::strcmp(yname(k), column[xsize]) == 0) {
         r = k;
       }
     }
@@ -204,28 +204,28 @@ bool TaggerImpl::add(size_t size, const char **column) {
 }
 
 bool TaggerImpl::add(const char* line) {
-  const char* column[8192];
   char *p = allocator_->strdup(line);
-  const size_t size = tokenize2(p, "\t ", column, sizeof(column));
-  if (!add2(size, column, false)) {
+  scoped_fixed_array<const char *, 8192> column;
+  const size_t size = tokenize2(p, "\t ", column.get(), column.size());
+  if (!add2(size, column.get(), false)) {
     return false;
   }
   return true;
 }
 
 bool TaggerImpl::read(std::istream *is) {
-  char line[8192];
+  scoped_fixed_array<char, 8192> line;
   clear();
 
   for (;;) {
-    if (!is->getline(line, sizeof(line))) {
+    if (!is->getline(line.get(), line.size())) {
       is->clear(std::ios::eofbit|std::ios::badbit);
       return true;
     }
     if (line[0] == '\0' || line[0] == ' ' || line[0] == '\t') {
       break;
     }
-    if (!add(line)) {
+    if (!add(line.get())) {
       return false;
     }
   }
@@ -436,7 +436,7 @@ double TaggerImpl::gradient(double *expected) {
   }
 
   for (size_t i = 0;   i < x_.size(); ++i) {
-    for (const int *f = node_[i][answer_[i]]->fvector; *f != -1; ++f){
+    for (const int *f = node_[i][answer_[i]]->fvector; *f != -1; ++f) {
       --expected[*f + answer_[i]];
     }
     s += node_[i][answer_[i]]->cost;  // UNIGRAM cost
@@ -669,7 +669,7 @@ Model *createModel(const char *argv) {
 }
 
 const char *getTaggerError() {
-  return errorStr.c_str();   
+  return errorStr.c_str();
 }
 
 const char *getLastError() {
