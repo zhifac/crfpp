@@ -67,7 +67,10 @@ NEXT2:
     return 0;
   }
 
-  max_xsize_ = _max(max_xsize_, static_cast<unsigned int>(col + 1));
+  // TODO(taku): very dirty workaround
+  if (check_max_xsize_) {
+    max_xsize_ = _max(max_xsize_, static_cast<unsigned int>(col + 1));
+  }
 
   const int idx = pos + row;
   if (idx < 0) {

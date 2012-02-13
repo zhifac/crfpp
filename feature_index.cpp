@@ -111,6 +111,7 @@ int EncoderFeatureIndex::getID(const char *key) const {
 
 bool EncoderFeatureIndex::open(const char *template_filename,
                                const char *train_filename) {
+  check_max_xsize_ = true;
   return openTemplate(template_filename) && openTagSet(train_filename);
 }
 

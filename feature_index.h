@@ -70,7 +70,8 @@ class FeatureIndex {
   const char* what() { return what_.str(); }
 
   explicit FeatureIndex(): maxid_(0), alpha_(0), alpha_float_(0),
-                           cost_factor_(1.0), xsize_(0), max_xsize_(0) {}
+                           cost_factor_(1.0), xsize_(0),
+                           check_max_xsize_(false), max_xsize_(0) {}
   virtual ~FeatureIndex() {}
 
  protected:
@@ -82,11 +83,12 @@ class FeatureIndex {
                  const char *pattern,
                  size_t pos, const TaggerImpl &tagger) const;
 
-  mutable unsigned int             maxid_;
+  mutable unsigned int      maxid_;
   const double             *alpha_;
   const float              *alpha_float_;
   double                    cost_factor_;
   unsigned int              xsize_;
+  bool check_max_xsize_;
   mutable unsigned int      max_xsize_;
   std::vector<std::string>  unigram_templs_;
   std::vector<std::string>  bigram_templs_;
