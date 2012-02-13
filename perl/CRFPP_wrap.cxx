@@ -1577,7 +1577,7 @@ void delete_CRFPP_Tagger (CRFPP::Tagger *t) {
 
 CRFPP::Tagger* new_CRFPP_Tagger (const char *arg) {
   CRFPP::Tagger *tagger = CRFPP::createTagger(arg);
-  if (!tagger) throw CRFPP::getlastError();
+  if (!tagger) throw CRFPP::getLastError();
   return tagger;
 }
 
