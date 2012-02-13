@@ -46,6 +46,9 @@
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
 
+/* */
+#define HAVE_SYS_CONF_SC_NPROCESSORS_CONF 1
+
 /* Define to 1 if you have the <sys/mman.h> header file. */
 #define HAVE_SYS_MMAN_H 1
 
@@ -60,6 +63,9 @@
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
+
+/* */
+#define HAVE_TLS_KEYWORD 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
@@ -93,7 +99,7 @@
 /* #undef STDC_HEADERS */
 
 /* Version number of package */
-#define VERSION "0.54"
+#define VERSION "0.55"
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */

@@ -33,6 +33,7 @@ class Allocator {
   Path *newPath(size_t thread_id);
   Node *newNode(size_t thread_id);
   void clear();
+  void clear_freelist(size_t thread_id);
   FeatureCache *feature_cache() const;
   size_t thread_num() const;
 

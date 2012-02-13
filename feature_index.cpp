@@ -67,6 +67,11 @@ void Allocator::clear() {
   }
 }
 
+void Allocator::clear_freelist(size_t thread_id) {
+  path_freelist_[thread_id].free();
+  node_freelist_[thread_id].free();
+}
+
 FeatureCache *Allocator::feature_cache() const {
   return feature_cache_.get();
 }

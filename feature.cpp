@@ -119,6 +119,7 @@ void FeatureIndex::rebuildFeatures(TaggerImpl *tagger) const {
   const size_t thread_id = tagger->thread_id();
 
   Allocator *allocator = tagger->allocator();
+  allocator->clear_freelist(thread_id);
   FeatureCache *feature_cache = allocator->feature_cache();
 
   for (size_t cur = 0; cur < tagger->size(); ++cur) {

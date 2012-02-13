@@ -2498,6 +2498,8 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
+
+
 am__api_version='1.11'
 
 ac_aux_dir=
@@ -16580,6 +16582,86 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_namespaces" >&5
 $as_echo "$ac_namespaces" >&6; }
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if ${CXX-c++} supports __thread (optional)" >&5
+$as_echo_n "checking if ${CXX-c++} supports __thread (optional)... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+__thread int a = 0;
+
+int
+main ()
+{
+
+  a = 10;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+ enable_tls=yes
+
+else
+
+ enable_tls=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_tls" >&5
+$as_echo "$enable_tls" >&6; }
+
+if test "$enable_tls" = "no"; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: __thread keyword is not supported on this environment. \
+Error handling of MeCab, e.g., MeCab::getLastError(), is not thread safe." >&5
+$as_echo "$as_me: WARNING: __thread keyword is not supported on this environment. \
+Error handling of MeCab, e.g., MeCab::getLastError(), is not thread safe." >&2;}
+else
+$as_echo "#define HAVE_TLS_KEYWORD 1" >>confdefs.h
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if ${CXX-c++} supports _SC_NPROCESSORS_CONF (optional)" >&5
+$as_echo_n "checking if ${CXX-c++} supports _SC_NPROCESSORS_CONF (optional)... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+  #include <unistd.h>
+  long n = sysconf(_SC_NPROCESSORS_CONF);
+
+int
+main ()
+{
+
+  n = 10;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+ enable_sysconf_sc_nprocessors_conf=yes
+
+else
+
+ enable_sysconf_sc_nprocessors_conf=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_sysconf_sc_nprocessors_conf" >&5
+$as_echo "$enable_sysconf_sc_nprocessors_conf" >&6; }
+
+if test "$enable_sysconf_sc_nprocessors_conf" = "no"; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: _SC_NPROCESSORS_CONF on this environment." >&5
+$as_echo "$as_me: WARNING: _SC_NPROCESSORS_CONF on this environment." >&2;}
+else
+$as_echo "#define HAVE_SYS_CONF_SC_NPROCESSORS_CONF 1" >>confdefs.h
+
+fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking if ${CXX-c++} environment provides all required features" >&5
 $as_echo_n "checking if ${CXX-c++} environment provides all required features... " >&6; }

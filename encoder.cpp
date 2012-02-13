@@ -5,6 +5,7 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
+#include <unistd.h>
 #include <fstream>
 #include "param.h"
 #include "encoder.h"
@@ -16,7 +17,34 @@
 #include "scoped_ptr.h"
 #include "thread.h"
 
+namespace CRFPP {
 namespace {
+
+inline size_t getCpuCount() {
+  size_t result = 1;
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  SYSTEM_INFO si;
+  ::GetSystemInfo(&si);
+  result = si.dwNumberOfProcessors;
+#else
+#ifdef HAVE_SYS_CONF_SC_NPROCESSORS_CONF
+  const long n = sysconf(_SC_NPROCESSORS_CONF);
+  if (n == -1) {
+    return 1;
+  }
+  result = static_cast<size_t>(n);
+#endif
+#endif
+  return result;
+}
+
+unsigned short getThreadSize(unsigned short size) {
+  if (size == 0) {
+    return static_cast<unsigned short>(getCpuCount());
+  }
+  return size;
+}
+
 bool toLower(std::string *s) {
   for (size_t i = 0; i < s->size(); ++i) {
     char c = (*s)[i];
@@ -28,8 +56,6 @@ bool toLower(std::string *s) {
   return true;
 }
 }
-
-namespace CRFPP {
 
 class CRFEncoderThread: public thread {
  public:
@@ -404,7 +430,7 @@ int crfpp_learn(int argc, char **argv) {
     {"textmodel", 't', 0,       0,
      "build also text model file for debugging" },
     {"algorithm",  'a', "CRF",   "(CRF|MIRA)", "select training algorithm" },
-    {"thread", 'p',   "1",       "INT",   "number of threads(default 1)" },
+    {"thread", 'p',   "0",       "INT",   "number of threads (default auto-detect)" },
     {"shrinking-size", 'H', "20", "INT",
      "set INT for number of iterations variable needs to "
      " be optimal before considered for shrinking. (default 20)" },
@@ -435,12 +461,13 @@ int crfpp_learn(int argc, char **argv) {
   const double         C              = param.get<float>("cost");
   const double         eta            = param.get<float>("eta");
   const bool           textmodel      = param.get<bool>("textmodel");
-  const unsigned short thread         = param.get<unsigned short>("thread");
+  const unsigned short thread         =
+      CRFPP::getThreadSize(param.get<unsigned short>("thread"));
   const unsigned short shrinking_size
       = param.get<unsigned short>("shrinking-size");
   std::string salgo = param.get<std::string>("algorithm");
 
-  toLower(&salgo);
+  CRFPP::toLower(&salgo);
 
   int algorithm = CRFPP::Encoder::MIRA;
   if (salgo == "crf" || salgo == "crf-l2") {
