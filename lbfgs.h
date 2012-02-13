@@ -25,10 +25,10 @@ class LBFGS {
   Mcsrch *mcsrch_;
 
   void pseudo_gradient(int size,
-		       double *v,
-		       double *x,
-		       const double *g,
-		       double C);
+                       double *v,
+                       double *x,
+                       const double *g,
+                       double C);
 
   void lbfgs_optimize(int size,
                       int msize,
@@ -55,7 +55,7 @@ class LBFGS {
       diag_.resize(size);
       v_.resize(size);
       if (orthant) {
-	xi_.resize(size);
+        xi_.resize(size);
       }
     } else if (diag_.size() != size || v_.size() != size) {
       std::cerr << "size of array is different" << std::endl;
@@ -66,11 +66,11 @@ class LBFGS {
     }
 
     if (orthant) {
-	    lbfgs_optimize(static_cast<int>(size),
-			   msize, x, f, g, &diag_[0], &w_[0], orthant, C, &v_[0], &xi_[0], &iflag_);
+            lbfgs_optimize(static_cast<int>(size),
+                           msize, x, f, g, &diag_[0], &w_[0], orthant, C, &v_[0], &xi_[0], &iflag_);
     } else {
-	    lbfgs_optimize(static_cast<int>(size),
-			   msize, x, f, g, &diag_[0], &w_[0], orthant, C, g, &xi_[0], &iflag_);
+            lbfgs_optimize(static_cast<int>(size),
+                           msize, x, f, g, &diag_[0], &w_[0], orthant, C, g, &xi_[0], &iflag_);
     }
 
     if (iflag_ < 0) {

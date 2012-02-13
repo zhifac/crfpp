@@ -437,7 +437,8 @@ int crfpp_learn(int argc, char **argv) {
     {"textmodel", 't', 0,       0,
      "build also text model file for debugging" },
     {"algorithm",  'a', "CRF",   "(CRF|MIRA)", "select training algorithm" },
-    {"thread", 'p',   "0",       "INT",   "number of threads (default auto-detect)" },
+    {"thread", 'p',   "0",       "INT",
+     "number of threads (default auto-detect)" },
     {"shrinking-size", 'H', "20", "INT",
      "set INT for number of iterations variable needs to "
      " be optimal before considered for shrinking. (default 20)" },

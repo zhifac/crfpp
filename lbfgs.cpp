@@ -22,11 +22,11 @@
 //   - D.C. Liu and J. Nocedal. On the Limited Memory Method for
 //   Large Scale Optimization(1989),
 //   Mathematical Programming B, 45, 3, pp. 503-528.
-#include "lbfgs.h"
-#include "common.h"
 #include <cmath>
 #include <iostream>
 #include <numeric>
+#include "lbfgs.h"
+#include "common.h"
 
 #define min(a, b) ((a) <= (b) ? (a) : (b))
 #define max(a, b) ((a) >= (b) ? (a) : (b))
@@ -389,7 +389,7 @@ void LBFGS::pseudo_gradient(int size,
   for (int i = 1; i <= size; ++i) {
     if (x[i] == 0) {
       if (g[i] + C < 0) {
-        v[i] = g[i] + C; 
+        v[i] = g[i] + C;
       } else if (g[i] - C > 0) {
         v[i] = g[i] - C;
       } else {

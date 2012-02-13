@@ -5,17 +5,20 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
+#if defined(_WIN32) && !defined(__CYGWIN__)
+#include <windows.h>
+#endif
+
+#include <string>
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "crfpp.h"
 #include "scoped_ptr.h"
-#include <string>
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
-#include <windows.h>
-namespace CRFPP {
 std::wstring Utf8ToWide(const std::string &input) {
   int output_length = ::MultiByteToWideChar(CP_UTF8, 0,
                                             input.c_str(), -1, NULL, 0);
@@ -75,7 +78,8 @@ const char* crfpp_model_strerror(crfpp_model_t *c) {
 }
 
 crfpp_t* crfpp_model_new_tagger(crfpp_model_t *c) {
-  return reinterpret_cast<crfpp_t *>(reinterpret_cast<CRFPP::Model *>(c)->createTagger());
+  return reinterpret_cast<crfpp_t *>(
+      reinterpret_cast<CRFPP::Model *>(c)->createTagger());
 }
 
 crfpp_t* crfpp_new(int argc, char **argv) {
