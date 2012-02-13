@@ -5,7 +5,14 @@
 //
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+#include <windows.h>
+#endif
+
 #include <fstream>
 #include "param.h"
 #include "encoder.h"

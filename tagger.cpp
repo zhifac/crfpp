@@ -16,9 +16,91 @@
 #include "tagger.h"
 
 namespace {
+const char kUnknownError[] = "Unknown Error";
+const size_t kErrorBufferSize = 256;
+}  // namespace
 
-std::string errorStr;
+#if defined(_WIN32) && !defined(__CYGWIN__)
+namespace {
+DWORD g_tls_index = TLS_OUT_OF_INDEXES;
 
+const char *getGlobalError() {
+  LPVOID data = ::TlsGetValue(g_tls_index);
+  return data == NULL ? kUnknownError : reinterpret_cast<const char *>(data);
+}
+
+void setGlobalError(const char *str) {
+  char *data = reinterpret_cast<char *>(::TlsGetValue(g_tls_index));
+  if (data == NULL) {
+    return;
+  }
+  strncpy(data, str, kErrorBufferSize - 1);
+  data[kErrorBufferSize - 1] = '\0';
+}
+}  // namespace
+HINSTANCE DllInstance = 0;
+
+extern "C" {
+  BOOL WINAPI DllMain(HINSTANCE hinst, DWORD dwReason, LPVOID) {
+    LPVOID data = 0;
+    if (!DllInstance) {
+      DllInstance = hinst;
+    }
+    switch (dwReason) {
+      case DLL_PROCESS_ATTACH:
+        if ((g_tls_index = ::TlsAlloc()) == TLS_OUT_OF_INDEXES) {
+          return FALSE;
+        }
+        // Not break in order to initialize the TLS.
+      case DLL_THREAD_ATTACH:
+        data = (LPVOID)::LocalAlloc(LPTR, kErrorBufferSize);
+        if (data) {
+          ::TlsSetValue(g_tls_index, data);
+        }
+        break;
+      case DLL_THREAD_DETACH:
+        data = ::TlsGetValue(g_tls_index);
+        if (data) {
+          ::LocalFree((HLOCAL)data);
+        }
+        break;
+      case DLL_PROCESS_DETACH:
+        data = ::TlsGetValue(g_tls_index);
+        if (data) {
+          ::LocalFree((HLOCAL)data);
+        }
+        ::TlsFree(g_tls_index);
+        g_tls_index = TLS_OUT_OF_INDEXES;
+        break;
+      default:
+        break;
+    }
+    return TRUE;
+  }
+}
+#else  // _WIN32
+
+namespace {
+#ifdef HAVE_TLS_KEYWORD
+__thread char kErrorBuffer[kErrorBufferSize];
+#else
+char kErrorBuffer[kErrorBufferSize];
+#endif
+}
+
+namespace {
+const char *getGlobalError() {
+  return kErrorBuffer;
+}
+
+void setGlobalError(const char *str) {
+  strncpy(kErrorBuffer, str, kErrorBufferSize - 1);
+  kErrorBuffer[kErrorBufferSize - 1] = '\0';
+}
+}  // namespace
+#endif
+
+namespace {
 static const CRFPP::Option long_options[] = {
   {"model",  'm',  0,       "FILE",  "set FILE for model file"},
   {"nbest",  'n', "0",      "INT",   "output n-best results"},
@@ -631,7 +713,7 @@ const char* TaggerImpl::toString() {
 Tagger *createTagger(int argc, char **argv) {
   TaggerImpl *tagger = new TaggerImpl();
   if (!tagger->open(argc, argv)) {
-    errorStr = tagger->what();
+    setGlobalError(tagger->what());
     delete tagger;
     return 0;
   }
@@ -641,7 +723,7 @@ Tagger *createTagger(int argc, char **argv) {
 Tagger *createTagger(const char *argv) {
   TaggerImpl *tagger = new TaggerImpl();
   if (!tagger->open(argv)) {
-    errorStr = tagger->what();
+    setGlobalError(tagger->what());
     delete tagger;
     return 0;
   }
@@ -651,7 +733,7 @@ Tagger *createTagger(const char *argv) {
 Model *createModel(int argc, char **argv) {
   ModelImpl *model = new ModelImpl();
   if (!model->open(argc, argv)) {
-    errorStr = model->what();
+    setGlobalError(model->what());
     delete model;
     return 0;
   }
@@ -661,7 +743,7 @@ Model *createModel(int argc, char **argv) {
 Model *createModel(const char *argv) {
   ModelImpl *model = new ModelImpl();
   if (!model->open(argv)) {
-    errorStr = model->what();
+    setGlobalError(model->what());
     delete model;
     return 0;
   }
@@ -669,11 +751,11 @@ Model *createModel(const char *argv) {
 }
 
 const char *getTaggerError() {
-  return errorStr.c_str();
+  return getGlobalError();
 }
 
 const char *getLastError() {
-  return errorStr.c_str();
+  return getGlobalError();
 }
 }   // namespace CRFPP
 

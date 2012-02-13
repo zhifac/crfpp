@@ -54,20 +54,9 @@ std::string WideToUtf8(const std::wstring &input) {
 }  // CRFPP
 #endif
 
-namespace {
-std::string errorStr;
-}
-
-#if defined(_WIN32) && !defined(__CYGWIN__) &&  defined(DLL_EXPORT)
-BOOL __stdcall DllMain(HINSTANCE hinst, DWORD dwReason, void*) {
-  return TRUE;
-}
-#endif
-
 crfpp_model_t* crfpp_model_new(int argc,  char **argv) {
   CRFPP::Model *model = CRFPP::createModel(argc, argv);
   if (!model) {
-    errorStr = CRFPP::getLastError();
     return 0;
   }
   return reinterpret_cast<crfpp_model_t *>(model);
@@ -76,7 +65,6 @@ crfpp_model_t* crfpp_model_new(int argc,  char **argv) {
 crfpp_model_t* crfpp_model_new2(const char *arg) {
   CRFPP::Model *model = CRFPP::createModel(arg);
   if (!model) {
-    errorStr = CRFPP::getLastError();
     return 0;
   }
   return reinterpret_cast<crfpp_model_t *>(model);
@@ -93,7 +81,6 @@ crfpp_t* crfpp_model_new_tagger(crfpp_model_t *c) {
 crfpp_t* crfpp_new(int argc, char **argv) {
   CRFPP::Tagger *tagger = CRFPP::createTagger(argc, argv);
   if (!tagger) {
-    errorStr = CRFPP::getLastError();
     return 0;
   }
   return reinterpret_cast<crfpp_t *>(tagger);
@@ -102,7 +89,6 @@ crfpp_t* crfpp_new(int argc, char **argv) {
 crfpp_t* crfpp_new2(char *arg) {
   CRFPP::Tagger *tagger = CRFPP::createTagger(arg);
   if (!tagger) {
-    errorStr = CRFPP::getLastError();
     return 0;
   }
   return reinterpret_cast<crfpp_t *>(tagger);
