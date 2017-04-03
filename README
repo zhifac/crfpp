@@ -1,2 +1,10 @@
 see doc/index.html
 
+build steps:
+====
+1. ./configure
+2. make
+
+[New Feature] convert a binary model to text model:
+===
+1. ./crf_learn -T <binary_model> <text_model_name>
