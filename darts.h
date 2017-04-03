@@ -11,6 +11,8 @@
 #include <vector>
 #include <cstring>
 #include <cstdio>
+#include <set>
+#include <stack>
 
 #ifdef HAVE_ZLIB_H
 namespace zlib {
@@ -261,6 +263,83 @@ class DoubleArrayImpl {
     for (size_t i = 0; i < size_; ++i)
       if (array_[i].check) ++result;
     return result;
+  }
+
+  node_type_ **get_keys(size_t &size) {size = key_size_; return key_;}
+  array_type_ *get_values(size_t &size) {size = key_size_; return value_;}
+
+  void recover_key_value() {
+    std::vector<node_type_> tmp_buf;
+    std::vector<node_type_ *> all_keys;
+    std::vector<array_type_> all_value;
+    std::stack<int*> s;
+    std::map<int, std::vector<int> > child_idx_map;
+    key_size_ = 0;
+    for (unsigned int i = 0; i < size_; i++) {
+      array_u_type_ c = array_[i].check;
+      if (c <= 0) continue;
+      std::map<int, std::vector<int> >::iterator it = child_idx_map.find(c);
+      if (it == child_idx_map.end()) {
+        std::vector<int> tmpVec;
+        tmpVec.push_back(i);
+        child_idx_map.insert(std::make_pair<int, std::vector<int> >(c, tmpVec));
+      } else {
+        it->second.push_back(i);
+      }
+    }
+    int* a = new int[2];
+    a[0] = 1;
+    a[1] = -1;
+    s.push(a);
+    while(true) {
+      int* pair = s.top();
+      std::map<int, std::vector<int> >::iterator it = child_idx_map.find(pair[0]);
+      if (it == child_idx_map.end() || ((int)(it->second.size() - 1) == pair[1])) {
+        int *ptr = s.top();
+        s.pop();
+        delete ptr;
+        if (s.empty()) {
+          break;
+        } else {
+          if (!tmp_buf.empty()) {
+            tmp_buf.erase(tmp_buf.end() - 1);
+          }
+          continue;
+        }
+      } else {
+        pair[1]++;
+      }
+      int c = it->second[pair[1]];
+      int code = (c - 1 - pair[0]);
+      if (array_[c].base > 0) {
+        int* b = new int[2];
+        b[0] = array_[c].base;
+        b[1] = -1;
+        s.push(b);
+        tmp_buf.push_back(static_cast<node_type_>(code));
+      } else if (array_[c].base < 0 && array_[c].check == (array_u_type_)c) {
+        node_type_ *node_arr = new node_type_[tmp_buf.size() + 1];
+        for (unsigned int i = 0; i < tmp_buf.size(); i++) {
+          node_arr[i] = tmp_buf[i];
+        }
+        node_arr[tmp_buf.size()] = (node_type_)0;
+        all_keys.push_back(node_arr);
+        all_value.push_back(-array_[c].base - 1);
+      }
+    }
+    if (all_value.size() > 0 && all_value.size() == all_keys.size()) {
+      key_ = new node_type_*[all_keys.size()];
+      for (unsigned int i = 0; i < all_keys.size(); i++) {
+        key_[i] = all_keys[i];
+      }
+      key_size_ = all_keys.size();
+      value_ = new array_type_[all_value.size()];
+      for (unsigned int i = 0; i < all_value.size(); i++) {
+        value_[i] = all_value[i];
+      }
+    } else {
+      std::cerr << " recover error" << std::endl;
+    }
   }
 
   int build(size_t     key_size,

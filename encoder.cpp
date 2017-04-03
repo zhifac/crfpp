@@ -434,6 +434,8 @@ int crfpp_learn(int argc, char **argv) {
      "set FLOAT for termination criterion(default 0.0001)" },
     {"convert",  'C',  0,       0,
      "convert text model to binary model" },
+    {"convert-to-text",  'T',  0,       0,
+     "convert binary model to text model" },
     {"textmodel", 't', 0,       0,
      "build also text model file for debugging" },
     {"algorithm",  'a', "CRF",   "(CRF|MIRA)", "select training algorithm" },
@@ -456,10 +458,11 @@ int crfpp_learn(int argc, char **argv) {
   }
 
   const bool convert = param.get<bool>("convert");
+  const bool convert_to_text = param.get<bool>("convert-to-text");
 
   const std::vector<std::string> &rest = param.rest_args();
-  if (param.get<bool>("help") ||
-      (convert && rest.size() != 2) || (!convert && rest.size() != 3)) {
+  if (param.get<bool>("help") || (convert_to_text && rest.size() != 2) ||
+      (convert && rest.size() != 2) || (!convert_to_text && !convert && rest.size() != 3)) {
     std::cout << param.help();
     return 0;
   }
@@ -493,6 +496,12 @@ int crfpp_learn(int argc, char **argv) {
   if (convert) {
     if (!encoder.convert(rest[0].c_str(), rest[1].c_str())) {
       std::cerr << encoder.what() << std::endl;
+      return -1;
+    }
+  } else if (convert_to_text) {
+    CRFPP::DecoderFeatureIndex dec_feature_index;
+    if (!dec_feature_index.convert(rest[0].c_str(), rest[1].c_str())) {
+      std::cerr << dec_feature_index.what() << std::endl;
       return -1;
     }
   } else {

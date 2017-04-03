@@ -115,6 +115,7 @@ class EncoderFeatureIndex: public FeatureIndex {
 class DecoderFeatureIndex: public FeatureIndex {
  public:
   bool open(const char *model_filename);
+  bool convert(const char *, const char *);
 
  private:
   Mmap <char> mmap_;

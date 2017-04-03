@@ -172,6 +172,114 @@ bool EncoderFeatureIndex::openTagSet(const char *filename) {
   return true;
 }
 
+bool DecoderFeatureIndex::convert(const char *model_filename,
+                                  const char *binarymodel) {
+  
+  CHECK_FALSE(mmap_.open(model_filename)) << mmap_.what();
+
+  const char *ptr = mmap_.begin();
+  unsigned int version_ = 0;
+
+  read_static<unsigned int>(&ptr, &version_);
+
+  CHECK_FALSE(version_ / 100 == version / 100)
+      << "model version is different: " << version_
+      << " vs " << version << " : " << model_filename;
+  int type = 0;
+  read_static<int>(&ptr, &type);
+  read_static<double>(&ptr, &cost_factor_);
+  read_static<unsigned int>(&ptr, &maxid_);
+  read_static<unsigned int>(&ptr, &xsize_);
+
+  unsigned int dsize = 0;
+  read_static<unsigned int>(&ptr, &dsize);
+
+  unsigned int y_str_size;
+  read_static<unsigned int>(&ptr, &y_str_size);
+  const char *y_str = read_ptr(&ptr, y_str_size);
+  size_t pos = 0;
+  while (pos < y_str_size) {
+    y_.push_back(y_str + pos);
+    while (y_str[pos++] != '\0') {}
+  }
+
+  unsigned int tmpl_str_size;
+  read_static<unsigned int>(&ptr, &tmpl_str_size);
+  const char *tmpl_str = read_ptr(&ptr, tmpl_str_size);
+  pos = 0;
+  while (pos < tmpl_str_size) {
+    const char *v = tmpl_str + pos;
+    if (v[0] == '\0') {
+      ++pos;
+    } else if (v[0] == 'U') {
+      unigram_templs_.push_back(v);
+    } else if (v[0] == 'B') {
+      bigram_templs_.push_back(v);
+    } else {
+      CHECK_FALSE(true) << "unknown type: " << v;
+    }
+    while (tmpl_str[pos++] != '\0') {}
+  }
+
+  size_t dsize_ = dsize / da_.unit_size();
+  da_.set_array(const_cast<char *>(ptr), dsize_);
+  ptr += dsize;
+
+  alpha_float_ = reinterpret_cast<const float *>(ptr);
+  ptr += sizeof(alpha_float_[0]) * maxid_;
+
+  CHECK_FALSE(ptr == mmap_.end()) <<
+      "model file is broken: " << model_filename;
+
+  std::string filename2 = binarymodel;
+
+  std::ofstream tofs(filename2.c_str());
+
+  CHECK_FALSE(tofs) << " no such file or directory: " << filename2;
+
+  // header
+  tofs << "version: "     << version_ << std::endl;
+  tofs << "cost-factor: " << cost_factor_ << std::endl;
+  tofs << "maxid: "       << maxid_ << std::endl;
+  tofs << "xsize: "       << xsize_ << std::endl;
+
+  tofs << std::endl;
+
+  // y
+  for (size_t i = 0; i < y_.size(); ++i)
+    tofs << y_[i] << std::endl;
+
+  tofs << std::endl;
+
+  // template
+  for (size_t i = 0; i < unigram_templs_.size(); ++i)
+    tofs << unigram_templs_[i] << std::endl;
+
+  for (size_t i = 0; i < bigram_templs_.size(); ++i)
+    tofs << bigram_templs_[i] << std::endl;
+
+  tofs << std::endl;
+
+  da_.recover_key_value();
+  size_t res;
+  char ** key = da_.get_keys(res);
+  int * val = da_.get_values(res);
+  for (unsigned int i = 0; i < res; i++) {
+    std::string str(key[i]);
+    tofs << val[i] << " " << str << std::endl;
+  }
+
+  tofs << std::endl;
+
+  tofs.setf(std::ios::fixed, std::ios::floatfield);
+  tofs.precision(16);
+
+  for (size_t i  = 0; i < maxid_; ++i)
+    tofs << alpha_float_[i] << std::endl;
+
+  return true;
+}
+
 bool DecoderFeatureIndex::open(const char *model_filename) {
   CHECK_FALSE(mmap_.open(model_filename)) << mmap_.what();
 
